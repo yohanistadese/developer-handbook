@@ -1,161 +1,297 @@
 # How to Connect Fastmail to a Custom Domain
 
-A practical guide for using Fastmail with a domain you already own (bought from GoDaddy, Dynadot, Hostinger, Cloudflare, Namecheap, or any other registrar).
+A simple guide for connecting a domain to Fastmail for sending and receiving email.
 
-This guide only adds **email** DNS records. It does not touch your website's existing DNS records (A records, CNAME for your site, etc.).
+This guide works with domains managed through **GoDaddy, Dynadot, Hostinger, Namecheap, Cloudflare**, or other DNS providers.
+
+> **Important:** This setup only changes email-related DNS records. Do not change your website's existing A, AAAA, CNAME, or other unrelated DNS records.
+
+## Setup Overview
 
 ```mermaid
 flowchart LR
-    A[Add domain in Fastmail] --> B[Open DNS settings at your provider]
-    B --> C[Add MX / SPF / DKIM / DMARC]
-    C --> D[Verify domain in Fastmail]
-    D --> E[Test incoming + outgoing email]
+    A[Add Domain to Fastmail] --> B[Open DNS Management]
+    B --> C[Configure Email DNS Records]
+    C --> D[Verify Domain]
+    D --> E[Test Email]
 ```
 
 ---
 
-## 1. What You Need
+## 1. Requirements
 
-* A domain name you own and can manage DNS for.
-* Login access to your DNS provider (registrar or DNS host).
-* A Fastmail account (any paid plan that supports custom domains).
-* A few minutes for DNS changes, plus wait time for propagation.
+Before starting, make sure you have:
 
----
+* A domain you own
+* Access to the domain's DNS management
+* A Fastmail account that supports custom domains
+* Access to the Fastmail domain setup page
 
-## 2. Add the Domain to Fastmail
-
-1. Log in to Fastmail.
-2. Go to **Settings → Domains**.
-3. Click **Add or buy domain**.
-4. Choose **"I already own this domain"** and enter your domain name.
-5. Fastmail will show you the DNS records you need to add.
-
-Keep this Fastmail page open in one tab — you'll copy values from it in the next steps.
+You do not need to transfer your domain to Fastmail. The domain can remain with your current registrar.
 
 ---
 
-## 3. Open DNS Settings
+## 2. Add Your Domain to Fastmail
 
-Go to your domain's DNS management page. This is usually called **DNS**, **DNS Management**, **DNS Zone**, or **Advanced DNS**, depending on the provider.
+1. Sign in to **Fastmail**.
+2. Open **Settings → Domains**.
+3. Select **Add or buy domain**.
+4. Choose **I already own this domain**.
+5. Enter your domain name.
+6. Continue through the setup.
 
-Open it in a second browser tab so you can copy values from Fastmail and paste them here.
+Fastmail will display the DNS records required for your domain.
 
----
-
-## 4. Add MX Records
-
-**MX (Mail Exchange)** records tell the internet which mail servers handle email for your domain.
-
-Steps:
-
-1. In Fastmail's domain setup page, copy the MX records shown (host/priority/value).
-2. In your DNS provider, add each MX record exactly as shown.
-3. **Remove any existing MX records** for the domain that point elsewhere (e.g. leftover records from a previous email provider or from your registrar's default parking page). A domain should only have the MX records for the mail provider you're actually using.
-
-| Type | Host | Priority | Value | Notes |
-|------|------|----------|-------|-------|
-| MX   | @    | (from Fastmail) | (from Fastmail) | Copy exact values from Fastmail |
-
-Do not guess these values — always copy them directly from your Fastmail domain setup screen, since they can change.
+Keep this page open because you will use these values when configuring your DNS.
 
 ---
 
-## 5. Add SPF
+## 3. Open Your DNS Management
 
-**SPF (Sender Policy Framework)** is a TXT record that lists which servers are allowed to send email for your domain. It helps prevent spoofing and improves deliverability.
+Open the DNS management page for your domain.
 
-Steps:
+The location depends on your provider. It may be called:
 
-1. Copy the SPF value shown in Fastmail (a TXT record on `@`, usually starting with `v=spf1`).
-2. Check if a TXT record starting with `v=spf1` already exists for your domain.
-   * If one exists, **do not add a second SPF record** — a domain can only have **one** SPF TXT record. Merge Fastmail's required part into the existing one instead of creating a new record.
-   * If none exists, add Fastmail's SPF value as a new TXT record.
+* DNS
+* DNS Management
+* DNS Records
+* DNS Zone
+* Advanced DNS
 
----
+Make sure you are editing DNS at the provider that is actually authoritative for your domain.
 
-## 6. Add DKIM
-
-**DKIM (DomainKeys Identified Mail)** signs your outgoing emails with a cryptographic key so receiving servers can verify the message really came from your domain and wasn't altered.
-
-Steps:
-
-1. In Fastmail's domain setup page, copy the DKIM records (usually CNAME records).
-2. Add each one to your DNS provider exactly as shown, using the exact host/name and value from Fastmail.
-3. Do not shorten or rewrite the values — DKIM values are case-sensitive and must match exactly.
+For example, if your domain was purchased from GoDaddy but its nameservers point to Cloudflare, you must add the DNS records in **Cloudflare**, not GoDaddy.
 
 ---
 
-## 7. Add DMARC
+## 4. Configure MX Records
 
-**DMARC (Domain-based Message Authentication, Reporting and Conformance)** tells receiving mail servers what to do with emails that fail SPF/DKIM checks (reject, quarantine, or allow), and where to send reports.
+**MX (Mail Exchange)** records tell the internet which mail servers receive email for your domain.
 
-Steps:
+### Steps
 
-1. Copy the DMARC TXT record Fastmail recommends (usually on `_dmarc.yourdomain.com`).
-2. Add it to your DNS provider.
-3. Review the policy value (`p=none`, `p=quarantine`, or `p=reject`):
-   * `p=none` — monitor only, safest starting point.
-   * `p=quarantine` — failing mail goes to spam.
-   * `p=reject` — failing mail is blocked outright.
-4. Start with `p=none` if you're unsure, then tighten it later once you confirm mail is flowing correctly.
+1. Find the MX records displayed in Fastmail.
+2. Add them to your DNS provider.
+3. Use the exact **host, value, and priority** shown by Fastmail.
+4. Remove old MX records that point to another email provider.
+
+Your DNS should contain the MX records required by Fastmail and should not contain conflicting MX records from another mail provider.
+
+| Type | Host |      Priority | Value         |
+| ---- | ---- | ------------: | ------------- |
+| MX   | `@`  | From Fastmail | From Fastmail |
+| MX   | `@`  | From Fastmail | From Fastmail |
+
+> **Do not copy MX values from this document.** Always use the current values displayed in your Fastmail account.
 
 ---
 
-## 8. Verify the Domain
+## 5. Configure SPF
 
-1. Go back to Fastmail's domain setup page.
-2. Click **Verify** / **Recheck DNS**.
-3. Fastmail will check MX, SPF, and DKIM and show a green checkmark for each once correctly detected.
-4. If something fails, double check the exact record type, host, and value against what Fastmail shows — a common mistake is a typo or an extra `.` at the end of a host name.
+**SPF (Sender Policy Framework)** identifies which servers are authorized to send email for your domain.
+
+Fastmail will provide the SPF value that should be used.
+
+### Steps
+
+1. Find the SPF record provided by Fastmail.
+2. Check whether your domain already has an SPF TXT record.
+3. If there is no existing SPF record, add the Fastmail record.
+4. If an SPF record already exists, update it instead of creating another one.
+
+> **Important:** A domain should have only one SPF record. Multiple SPF records can cause SPF authentication to fail.
+
+If you use other services to send email from your domain, such as a website, CRM, or marketing platform, make sure their SPF requirements are included in the same SPF record.
+
+---
+
+## 6. Configure DKIM
+
+**DKIM (DomainKeys Identified Mail)** authenticates outgoing email using cryptographic signatures.
+
+Fastmail normally provides DKIM records that you need to add to your DNS.
+
+### Steps
+
+1. Copy the DKIM record details from Fastmail.
+2. Add each record to your DNS provider.
+3. Use the exact **record type, host/name, and value** provided by Fastmail.
+4. Do not modify or shorten the values.
+
+DKIM records are commonly provided as **CNAME records**, but always follow what Fastmail currently displays.
+
+---
+
+## 7. Configure DMARC
+
+**DMARC (Domain-based Message Authentication, Reporting and Conformance)** helps protect your domain from unauthorized email and defines how receiving mail servers should handle authentication failures.
+
+If Fastmail provides a recommended DMARC record, follow its current instructions.
+
+A DMARC record is normally added as a TXT record using:
+
+```text
+_dmarc
+```
+
+### Common policies
+
+| Policy         | Purpose                                              |
+| -------------- | ---------------------------------------------------- |
+| `p=none`       | Monitor authentication results without blocking mail |
+| `p=quarantine` | Treat failing messages as suspicious or spam         |
+| `p=reject`     | Reject messages that fail DMARC                      |
+
+If you are setting up DMARC for the first time, `p=none` is generally the safest starting point while you verify that legitimate email is authenticating correctly.
+
+---
+
+## 8. Verify the Domain in Fastmail
+
+After adding the DNS records:
+
+1. Return to **Fastmail → Settings → Domains**.
+2. Open your domain.
+3. Select **Verify**, **Check**, or **Recheck DNS**.
+4. Wait for Fastmail to detect the DNS records.
+5. Fix any records Fastmail reports as missing or incorrect.
+
+DNS changes may not appear immediately.
+
+If verification fails, compare the DNS records in your provider with the values shown by Fastmail.
 
 ---
 
 ## 9. Test Email
 
-Once verification passes:
+Once Fastmail verifies the domain, test both directions.
 
-1. **Incoming:** Send a test email from another account (e.g. Gmail) to your new address. Confirm it arrives in Fastmail.
-2. **Outgoing:** Send a test email from Fastmail to an external address (e.g. Gmail). Confirm it arrives and isn't marked as spam.
-3. Optionally check the message headers on the received email to confirm SPF and DKIM both show `pass`.
+### Test Incoming Email
 
----
+Send an email from another provider, such as Gmail, to your Fastmail address.
 
-## 10. Important DNS Rules
+Confirm that the message arrives successfully.
 
-* **Only one SPF record per domain.** Multiple SPF TXT records break SPF entirely — merge them instead.
-* **Remove conflicting old MX records** before adding new ones, or mail delivery will be inconsistent.
-* **Copy values exactly from Fastmail** — don't hardcode or reuse values from another guide, screenshot, or domain. Fastmail's values can be account-specific.
-* **DNS propagation takes time.** Changes can take anywhere from a few minutes up to 24–48 hours to fully propagate, depending on TTL and your provider.
-* **Don't touch unrelated records.** Leave your website's A/CNAME/other records alone — only add or edit the mail-related records (MX, SPF, DKIM, DMARC).
-* If your DNS is hosted somewhere other than your registrar (e.g. Cloudflare in front of a GoDaddy domain), make changes in the place that's actually authoritative for DNS.
+### Test Outgoing Email
 
----
+Send an email from your Fastmail address to an external address, such as Gmail.
 
-## 11. Common DNS Provider Locations
+Confirm that:
 
-| Provider    | Where to find DNS settings |
-|-------------|------------------------------------------------|
-| GoDaddy     | My Products → Domain → DNS → Manage DNS Records |
-| Namecheap   | Domain List → Manage → Advanced DNS |
-| Cloudflare  | Select domain → DNS → Records |
-| Hostinger   | Domains → Manage → DNS / Name Servers |
-| Dynadot     | My Domains → select domain → DNS settings |
+* The message is delivered.
+* The message is not incorrectly marked as spam.
+* The sender address is correct.
 
-Menu names change over time — if you can't find it, search for "DNS", "Zone", or "Advanced DNS" in your provider's dashboard.
+### Check Authentication
+
+If needed, inspect the received email headers and confirm that:
+
+```text
+SPF: PASS
+DKIM: PASS
+DMARC: PASS
+```
 
 ---
 
-## 12. Final Checklist
+## 10. DNS Rules to Remember
 
-* [ ] Domain verified in Fastmail
-* [ ] MX configured
-* [ ] SPF configured
-* [ ] DKIM configured
-* [ ] DMARC reviewed
-* [ ] Incoming email tested
-* [ ] Outgoing email tested
-* [ ] SPF/DKIM authentication passes
+### Do
 
-**Setup complete:** ✅
+* Copy DNS values directly from Fastmail.
+* Remove conflicting MX records.
+* Keep only one SPF record.
+* Leave existing website DNS records unchanged.
+* Make DNS changes at the authoritative DNS provider.
+* Allow time for DNS changes to propagate.
 
+### Don't
+
+* Do not guess Fastmail DNS values.
+* Do not create multiple SPF records.
+* Do not remove website A or CNAME records unnecessarily.
+* Do not modify unrelated DNS records.
+* Do not reuse DNS values from another domain.
+
+---
+
+## 11. DNS Propagation
+
+DNS changes are not always visible immediately.
+
+Depending on the DNS provider and record TTL, changes may take:
+
+* A few minutes in many cases
+* Several hours in some cases
+* Up to 24–48 hours in some situations
+
+You do not normally need to make the DNS changes again while waiting for propagation.
+
+---
+
+## 12. Common DNS Provider Locations
+
+| Provider       | DNS Management                          |
+| -------------- | --------------------------------------- |
+| **GoDaddy**    | My Products → Domain → DNS → Manage DNS |
+| **Dynadot**    | My Domains → Domain → DNS Settings      |
+| **Hostinger**  | Domains → Manage → DNS / DNS Zone       |
+| **Namecheap**  | Domain List → Manage → Advanced DNS     |
+| **Cloudflare** | Select Domain → DNS → Records           |
+
+Provider interfaces can change. If you cannot find the DNS settings, search the provider dashboard for **DNS**, **DNS Records**, **DNS Zone**, or **Advanced DNS**.
+
+---
+
+## 13. Troubleshooting
+
+### Fastmail cannot verify the domain
+
+Check:
+
+* The record type is correct.
+* The host/name is correct.
+* The value is copied exactly.
+* There are no conflicting records.
+* The DNS change has had enough time to propagate.
+
+### Email is not arriving
+
+Check:
+
+* MX records are correct.
+* Old MX records have been removed.
+* The domain is verified in Fastmail.
+* DNS changes have propagated.
+
+### Emails are going to spam
+
+Check:
+
+* SPF is configured correctly.
+* DKIM is configured correctly.
+* DMARC is configured correctly.
+* SPF and DKIM authentication pass on received messages.
+
+### Website stopped working after DNS changes
+
+Do not remove or modify website DNS records unless they are specifically related to email.
+
+Check that the existing **A, AAAA, and CNAME** records are still present.
+
+---
+
+## 14. Setup Complete
+
+The Fastmail domain setup is complete when:
+
+* The domain is verified in Fastmail.
+* Fastmail's MX records are active.
+* SPF is configured.
+* DKIM is configured.
+* DMARC is reviewed/configured.
+* Incoming email works.
+* Outgoing email works.
+* SPF/DKIM authentication passes.
+
+**Your domain can now use Fastmail for email while continuing to use your existing hosting provider for the website.**
