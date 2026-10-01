@@ -1,0 +1,92 @@
+:root {
+  --bg: #ffffff;
+  --text: #1f2328;
+  --muted: #59636e;
+  --border: #d1d9e0;
+  --surface: #f6f8fa;
+  --link: #0969da;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --text: #e6edf3;
+    --muted: #9198a1;
+    --border: #3d444d;
+    --surface: #151b23;
+    --link: #4493f8;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-header a { color: var(--text); font-weight: 600; }
+
+.doc {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+  overflow-wrap: break-word;
+}
+
+.doc h1, .doc h2, .doc h3, .doc h4 { line-height: 1.25; margin: 1.6em 0 0.6em; }
+.doc h1 { font-size: 2em; margin-top: 0; }
+.doc h1, .doc h2 { padding-bottom: 0.3em; border-bottom: 1px solid var(--border); }
+.doc h2 { font-size: 1.5em; }
+
+.doc img { max-width: 100%; }
+
+.doc blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 4px solid var(--border);
+}
+
+.doc code {
+  font: 0.875em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--surface);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+}
+
+.doc pre {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.doc pre code { padding: 0; background: none; font-size: 0.85em; }
+
+.doc table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+
+.doc th, .doc td { padding: 6px 13px; border: 1px solid var(--border); }
+.doc th { background: var(--surface); }
+
+.doc hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+
+.not-found { text-align: center; padding-top: 48px; }
+.not-found h1 { border: 0; font-size: 3em; }
