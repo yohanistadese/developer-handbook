@@ -10,18 +10,18 @@ Part of the [Mobile Development Handbook](README.md). Previous: [02 — Architec
 
 ### 1.1 The three environments
 
-| | **ProjectName Dev** | **ProjectName Trial** | **ProjectName** (Production) |
-| --- | --- | --- | --- |
-| Purpose | Daily development, debugging | QA, demos, stakeholder testing, pre-release checks | Real customers |
-| Backend | `https://dev-api.YOUR_DOMAIN` | `https://trial-api.YOUR_DOMAIN` | `https://api.YOUR_DOMAIN` |
-| Data | Disposable test data | Realistic, non-customer data | Real data |
-| Payments | Square **sandbox** | Square **sandbox** (or prod with a test merchant) | Square **production** |
-| EAS environment | `development` | `preview` | `production` |
-| EAS build profile | `development` (dev client) | `preview` (internal) | `production` (store) |
-| iOS scheme | `ProjectNameDevelopment` | `ProjectNameTrial` | `ProjectNameProduction` |
-| Bundle ID / App ID | `YOUR_BUNDLE_ID.dev` | `YOUR_BUNDLE_ID.trial` | `YOUR_BUNDLE_ID` |
-| App name on device | ProjectName Dev | ProjectName Trial | ProjectName |
-| Distribution | Simulator / internal | Internal, TestFlight, Play internal testing | App Store / Play production |
+|                    | **ProjectName Dev**           | **ProjectName Trial**                              | **ProjectName** (Production) |
+| ------------------ | ----------------------------- | -------------------------------------------------- | ---------------------------- |
+| Purpose            | Daily development, debugging  | QA, demos, stakeholder testing, pre-release checks | Real customers               |
+| Backend            | `https://dev-api.YOUR_DOMAIN` | `https://trial-api.YOUR_DOMAIN`                    | `https://api.YOUR_DOMAIN`    |
+| Data               | Disposable test data          | Realistic, non-customer data                       | Real data                    |
+| Payments           | Square **sandbox**            | Square **sandbox** (or prod with a test merchant)  | Square **production**        |
+| EAS environment    | `development`                 | `preview`                                          | `production`                 |
+| EAS build profile  | `development` (dev client)    | `preview` (internal)                               | `production` (store)         |
+| iOS scheme         | `ProjectNameDevelopment`      | `ProjectNameTrial`                                 | `ProjectNameProduction`      |
+| Bundle ID / App ID | `YOUR_BUNDLE_ID.dev`          | `YOUR_BUNDLE_ID.trial`                             | `YOUR_BUNDLE_ID`             |
+| App name on device | ProjectName Dev               | ProjectName Trial                                  | ProjectName                  |
+| Distribution       | Simulator / internal          | Internal, TestFlight, Play internal testing        | App Store / Play production  |
 
 > **Project example:** it has development and production values plus a `preview` profile, two iOS schemes, and **one bundle ID shared by every environment**. That works, but dev and prod builds then can't be installed side by side, and it's easy to mix them up on a device. For a new project, use a separate ID and name per environment (§3.2).
 
@@ -29,14 +29,14 @@ Part of the [Mobile Development Handbook](README.md). Previous: [02 — Architec
 
 Use the **same variable name** in every environment. Only the value changes. Don't use `BASE_URL_DEV` / `BASE_URL_PROD` names that code has to choose between. **Project example** set (names only):
 
-| Variable | Purpose | Visibility |
-| --- | --- | --- |
-| `BASE_URL` | REST API **and** socket URL | public (plaintext) |
-| `SQUARE_APPLICATION_ID` | Square app ID (`sandbox-…` in dev/trial) | public, but per-environment |
-| `GOOGLE_MAPS_API_KEY` | Maps SDK for iOS/Android + web services | public in the app, so **restrict it** (§4.3) |
-| `TENANT_ID` (project example uses a company ID) | Fallback tenant when the user has none | non-secret |
-| Third-party tracking base URL / client ID / API key | Telematics integration | see warning below |
-| Support webhook URL | Sends support messages | see warning below |
+| Variable                                            | Purpose                                  | Visibility                                   |
+| --------------------------------------------------- | ---------------------------------------- | -------------------------------------------- |
+| `BASE_URL`                                          | REST API **and** socket URL              | public (plaintext)                           |
+| `SQUARE_APPLICATION_ID`                             | Square app ID (`sandbox-…` in dev/trial) | public, but per-environment                  |
+| `GOOGLE_MAPS_API_KEY`                               | Maps SDK for iOS/Android + web services  | public in the app, so **restrict it** (§4.3) |
+| `TENANT_ID` (project example uses a company ID)     | Fallback tenant when the user has none   | non-secret                                   |
+| Third-party tracking base URL / client ID / API key | Telematics integration                   | see warning below                            |
+| Support webhook URL                                 | Sends support messages                   | see warning below                            |
 
 > ⚠️ **Everything the app reads at runtime is public.** `EXPO_PUBLIC_*`, `react-native-config`, `app.config.js` `extra`, `BuildConfig` and `Info.plist` values all end up inside the IPA/APK and can be extracted. Marking a variable `sensitive` in EAS only hides it in the dashboard and logs, not in the binary.
 >
@@ -44,14 +44,14 @@ Use the **same variable name** in every environment. Only the value changes. Don
 
 ### 1.3 Public vs private configuration
 
-| Can be in the app (public) | Must stay on the backend (private) |
-| --- | --- |
-| API base URL | Database credentials, JWT secrets |
-| Square **Application ID** | Square **Application Secret**, merchant **access/refresh tokens**, webhook signature key |
-| Google Maps key (restricted to your app) | Unrestricted Google keys, service-account JSON |
-| Firebase `google-services.json` / `GoogleService-Info.plist` (client config) | FCM server key / service account, APNs `.p8` key |
-| Feature flags | Third-party API keys, webhook URLs |
-| Sentry DSN (public by design) | Sentry auth token (used to upload source maps in CI only) |
+| Can be in the app (public)                                                   | Must stay on the backend (private)                                                       |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| API base URL                                                                 | Database credentials, JWT secrets                                                        |
+| Square **Application ID**                                                    | Square **Application Secret**, merchant **access/refresh tokens**, webhook signature key |
+| Google Maps key (restricted to your app)                                     | Unrestricted Google keys, service-account JSON                                           |
+| Firebase `google-services.json` / `GoogleService-Info.plist` (client config) | FCM server key / service account, APNs `.p8` key                                         |
+| Feature flags                                                                | Third-party API keys, webhook URLs                                                       |
+| Sentry DSN (public by design)                                                | Sentry auth token (used to upload source maps in CI only)                                |
 
 ### 1.4 Env files
 
@@ -129,9 +129,21 @@ Each `eas.json` build profile chooses **one** environment:
 ```json
 {
   "build": {
-    "development": { "developmentClient": true, "distribution": "internal", "environment": "development" },
-    "preview":     { "distribution": "internal", "environment": "preview", "android": { "buildType": "apk" } },
-    "production":  { "autoIncrement": true, "environment": "production", "android": { "buildType": "app-bundle" } }
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "android": { "buildType": "apk" }
+    },
+    "production": {
+      "autoIncrement": true,
+      "environment": "production",
+      "android": { "buildType": "app-bundle" }
+    }
   }
 }
 ```
@@ -227,9 +239,9 @@ With Expo config (CNG) or EAS, derive identity from a variable instead of mainta
 // app.config.js
 const APP_ENV = process.env.APP_ENV ?? 'development'; // set per EAS environment
 const variants = {
-  development: { name: 'ProjectName Dev',   id: 'YOUR_BUNDLE_ID.dev',   scheme: 'projectname-dev' },
-  preview:     { name: 'ProjectName Trial', id: 'YOUR_BUNDLE_ID.trial', scheme: 'projectname-trial' },
-  production:  { name: 'ProjectName',       id: 'YOUR_BUNDLE_ID',       scheme: 'projectname' },
+  development: { name: 'ProjectName Dev', id: 'YOUR_BUNDLE_ID.dev', scheme: 'projectname-dev' },
+  preview: { name: 'ProjectName Trial', id: 'YOUR_BUNDLE_ID.trial', scheme: 'projectname-trial' },
+  production: { name: 'ProjectName', id: 'YOUR_BUNDLE_ID', scheme: 'projectname' },
 };
 const v = variants[APP_ENV];
 
@@ -280,13 +292,13 @@ Make it obvious. Don't rely on memory:
 
 Google Cloud APIs to enable (only what you use):
 
-| API | Needed for |
-| --- | --- |
-| Maps SDK for Android | Android map rendering |
-| Maps SDK for iOS | iOS map rendering with `PROVIDER_GOOGLE` |
+| API                            | Needed for                                       |
+| ------------------------------ | ------------------------------------------------ |
+| Maps SDK for Android           | Android map rendering                            |
+| Maps SDK for iOS               | iOS map rendering with `PROVIDER_GOOGLE`         |
 | Directions API (or Routes API) | Route polylines (`react-native-maps-directions`) |
-| Geocoding API | Address ↔ coordinates |
-| Places API | Address autocomplete |
+| Geocoding API                  | Address ↔ coordinates                            |
+| Places API                     | Address autocomplete                             |
 
 **Billing:** Maps Platform requires a billing account even for free-tier usage. Without one, maps render grey or blank and web-service calls return `REQUEST_DENIED`. Set **budget alerts** and per-API **quotas**. A leaked unrestricted key can run up large bills.
 
@@ -320,11 +332,11 @@ With CNG: `ios.config.googleMapsApiKey`. Add the Google Maps pod in the Podfile 
 
 Create **separate keys**:
 
-| Key | Application restriction | API restriction |
-| --- | --- | --- |
-| Android key | Android apps: `YOUR_PACKAGE_NAME` + **SHA-1** of debug, upload **and Play App Signing** certificates | Maps SDK for Android |
-| iOS key | iOS apps: `YOUR_BUNDLE_ID` (each variant) | Maps SDK for iOS |
-| Web-service key (Directions/Geocoding/Places) | **Backend server IP** (call these APIs from the backend) | Only those APIs |
+| Key                                           | Application restriction                                                                              | API restriction      |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------- |
+| Android key                                   | Android apps: `YOUR_PACKAGE_NAME` + **SHA-1** of debug, upload **and Play App Signing** certificates | Maps SDK for Android |
+| iOS key                                       | iOS apps: `YOUR_BUNDLE_ID` (each variant)                                                            | Maps SDK for iOS     |
+| Web-service key (Directions/Geocoding/Places) | **Backend server IP** (call these APIs from the backend)                                             | Only those APIs      |
 
 - Get SHA-1 values with `cd android && ./gradlew signingReport` (debug/upload) and **Play Console → App integrity** (the app-signing key Google uses for store installs). A missing Play signing SHA-1 is the classic "maps work in dev, blank in production" bug.
 - Directions/Geocoding/Places called directly from the app need an unrestricted or loosely restricted key, because those web APIs can't check app signatures. Proxy them through the backend.
@@ -336,7 +348,7 @@ Create **separate keys**:
 <MapView
   provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
   style={StyleSheet.absoluteFill}
-  initialRegion={MAP_CONFIG.defaultRegion}    // not `region` unless you control it
+  initialRegion={MAP_CONFIG.defaultRegion} // not `region` unless you control it
   showsUserLocation={hasLocationPermission}
   onMapReady={() => setMapReady(true)}
 >
@@ -352,21 +364,25 @@ Create **separate keys**:
 
 ### 4.5 Location permissions
 
-| | Foreground | Background |
-| --- | --- | --- |
-| iOS | `NSLocationWhenInUseUsageDescription` | + `NSLocationAlwaysAndWhenInUseUsageDescription`, `UIBackgroundModes: [location]` |
+|         | Foreground                                        | Background                                                                          |
+| ------- | ------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| iOS     | `NSLocationWhenInUseUsageDescription`             | + `NSLocationAlwaysAndWhenInUseUsageDescription`, `UIBackgroundModes: [location]`   |
 | Android | `ACCESS_FINE_LOCATION` / `ACCESS_COARSE_LOCATION` | + `ACCESS_BACKGROUND_LOCATION`, `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` |
 
 **Project example** `expo-location` plugin:
 
 ```js
-['expo-location', {
-  locationWhenInUsePermission: 'ProjectName uses your location for dispatch and tracking.',
-  locationAlwaysAndWhenInUsePermission: 'ProjectName uses your location for tracking, including in the background.',
-  isIosBackgroundLocationEnabled: true,
-  isAndroidBackgroundLocationEnabled: true,
-  isAndroidForegroundServiceEnabled: true,
-}]
+[
+  'expo-location',
+  {
+    locationWhenInUsePermission: 'ProjectName uses your location for dispatch and tracking.',
+    locationAlwaysAndWhenInUsePermission:
+      'ProjectName uses your location for tracking, including in the background.',
+    isIosBackgroundLocationEnabled: true,
+    isAndroidBackgroundLocationEnabled: true,
+    isAndroidForegroundServiceEnabled: true,
+  },
+];
 ```
 
 Flow: ask for **foreground** first, explain why background is needed, then ask for background. On Android 11+ "Allow all the time" is only available in Settings, so send the user there with a clear explanation.
@@ -375,14 +391,19 @@ Flow: ask for **foreground** first, explain why background is needed, then ask f
 
 ```ts
 // index.ts — module scope, before registerRootComponent
-TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => { /* send to backend */ });
+TaskManager.defineTask(BACKGROUND_LOCATION_TASK, async ({ data, error }) => {
+  /* send to backend */
+});
 
 // when tracking starts (app in foreground!)
 await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
   accuracy: Location.Accuracy.Balanced,
   timeInterval: 60_000,
   distanceInterval: 50,
-  foregroundService: { notificationTitle: 'Tracking active', notificationBody: 'Location is shared while on duty.' },
+  foregroundService: {
+    notificationTitle: 'Tracking active',
+    notificationBody: 'Location is shared while on duty.',
+  },
   pausesUpdatesAutomatically: false,
 });
 ```
@@ -394,12 +415,12 @@ await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {
 
 ### 4.7 GPS and map errors
 
-| Symptom | Cause / fix |
-| --- | --- |
-| `getCurrentPositionAsync` hangs/timeouts indoors | Use `getLastKnownPositionAsync` first, then a fresh fix with a timeout |
-| "Location services are disabled" | Check `hasServicesEnabledAsync()`; prompt to enable |
-| Location works in foreground only | Background permission not granted, or task not defined at module scope |
-| Simulator shows no location | Set it: Simulator → Features → Location; Android emulator → Extended controls |
+| Symptom                                          | Cause / fix                                                                   |
+| ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `getCurrentPositionAsync` hangs/timeouts indoors | Use `getLastKnownPositionAsync` first, then a fresh fix with a timeout        |
+| "Location services are disabled"                 | Check `hasServicesEnabledAsync()`; prompt to enable                           |
+| Location works in foreground only                | Background permission not granted, or task not defined at module scope        |
+| Simulator shows no location                      | Set it: Simulator → Features → Location; Android emulator → Extended controls |
 
 More map troubleshooting: [05 §8](05-mobile-troubleshooting-and-best-practices.md#8-maps-and-location).
 
@@ -417,28 +438,28 @@ Mobile App ──(user JWT)──► ProjectName Backend ──(merchant OAuth t
     └── Square Mobile Payments SDK ┘ (authorised with a short-lived session token from the backend)
 ```
 
-| Backend responsibilities | Mobile responsibilities |
-| --- | --- |
-| Holds Square **Application Secret**, webhook signature key | Holds only the public **Application ID** (per environment) |
-| Runs OAuth: builds authorize URL, validates `state`, exchanges code, **stores tokens encrypted** per company | Opens the authorize URL, handles the return deep link, refreshes status |
+| Backend responsibilities                                                                                                | Mobile responsibilities                                                 |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Holds Square **Application Secret**, webhook signature key                                                              | Holds only the public **Application ID** (per environment)              |
+| Runs OAuth: builds authorize URL, validates `state`, exchanges code, **stores tokens encrypted** per company            | Opens the authorize URL, handles the return deep link, refreshes status |
 | Refreshes / rotates tokens, handles revocation webhooks, marks connection `valid / expired / revoked / needs_reconnect` | Shows connection status and reconnect / disconnect actions (admin only) |
-| Picks the merchant **location ID** | Requests runtime permissions (location, Bluetooth, mic) |
-| Mints a **short-lived, payment-scoped session token** for the device | Calls SDK `authorize(token, locationId)`, then `startPayment(...)` |
-| **Verifies every payment** with Square before recording it | Sends `paymentId` + invoice reference to the backend |
-| Decides amount and currency (from the invoice) | Displays the amount; never the source of truth |
+| Picks the merchant **location ID**                                                                                      | Requests runtime permissions (location, Bluetooth, mic)                 |
+| Mints a **short-lived, payment-scoped session token** for the device                                                    | Calls SDK `authorize(token, locationId)`, then `startPayment(...)`      |
+| **Verifies every payment** with Square before recording it                                                              | Sends `paymentId` + invoice reference to the backend                    |
+| Decides amount and currency (from the invoice)                                                                          | Displays the amount; never the source of truth                          |
 
 **Project example backend endpoints** (rename for your project):
 
-| Method & path | Purpose |
-| --- | --- |
-| `GET /api/v1/square/oauth/authorize?platform=mobile` | Returns `{ authorizationUrl }` (with server-generated `state`) |
-| `GET /api/v1/square/oauth/callback` | Square redirects here; backend exchanges the code, then redirects to the app/web with `?status=success|error&message=` |
-| `GET /api/v1/square/account` | `{ connected, merchantId, locationId }`, no tokens |
-| `GET /api/v1/square/business` | Display info (business name, country, currency), admin only |
-| `GET /api/v1/square/session` | `{ authorizationCode /* short-lived token */, locationId, applicationId, expiresAt }` |
-| `POST /api/v1/square/payments` | Verify + record a completed payment |
-| `DELETE /api/v1/square/account` | Disconnect (revoke + mark disconnected) |
-| `POST /api/v1/square/webhooks` | OAuth revocation webhook (signature-verified) |
+| Method & path                                        | Purpose                                                                                                |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `GET /api/v1/square/oauth/authorize?platform=mobile` | Returns `{ authorizationUrl }` (with server-generated `state`)                                         |
+| `GET /api/v1/square/oauth/callback`                  | Square redirects here; backend exchanges the code, then redirects to the app/web with `?status=success | error&message=` |
+| `GET /api/v1/square/account`                         | `{ connected, merchantId, locationId }`, no tokens                                                     |
+| `GET /api/v1/square/business`                        | Display info (business name, country, currency), admin only                                            |
+| `GET /api/v1/square/session`                         | `{ authorizationCode /* short-lived token */, locationId, applicationId, expiresAt }`                  |
+| `POST /api/v1/square/payments`                       | Verify + record a completed payment                                                                    |
+| `DELETE /api/v1/square/account`                      | Disconnect (revoke + mark disconnected)                                                                |
+| `POST /api/v1/square/webhooks`                       | OAuth revocation webhook (signature-verified)                                                          |
 
 ### 5.2 Square developer setup
 
@@ -471,7 +492,12 @@ useEffect(() => {
     if (!url.includes('square-callback')) return;
     // RN 0.74's URL polyfill has no searchParams, so parse the query by hand
     const status = /[?&]status=([^&]*)/.exec(url)?.[1];
-    showMessage({ type: status === 'success' ? 'success' : 'danger', message: t(status === 'success' ? 'squareAccount.connected' : 'squareAccount.connectionFailed') });
+    showMessage({
+      type: status === 'success' ? 'success' : 'danger',
+      message: t(
+        status === 'success' ? 'squareAccount.connected' : 'squareAccount.connectionFailed'
+      ),
+    });
     refetchAccount();
   };
   const sub = Linking.addEventListener('url', ({ url }) => handleUrl(url));
@@ -512,23 +538,26 @@ If the ID is empty, skip initialisation and have JS report "payments not configu
 ```ts
 export async function startCardPayment(amountCents: number) {
   if (!Number.isSafeInteger(amountCents) || amountCents <= 0) return fail('invalidAmount');
-  if (inProgress) return fail('inProgress');          // one payment at a time
+  if (inProgress) return fail('inProgress'); // one payment at a time
   inProgress = true;
   try {
     if (!(await ensurePaymentPermissions())) return fail('permission');
-    await ensureSquareAuthorized();                   // see below
+    await ensureSquareAuthorized(); // see below
     const payment = await startPayment(
       {
         amountMoney: { amount: amountCents, currencyCode: CurrencyCode.USD },
         processingMode: ProcessingMode.ONLINE_ONLY,
         allowCardSurcharge: false,
-        paymentAttemptId: makeUniqueId(),             // idempotency for this attempt
+        paymentAttemptId: makeUniqueId(), // idempotency for this attempt
       },
-      { additionalMethods: [AdditionalPaymentMethodType.KEYED, AdditionalPaymentMethodType.CASH], mode: PromptMode.DEFAULT }
+      {
+        additionalMethods: [AdditionalPaymentMethodType.KEYED, AdditionalPaymentMethodType.CASH],
+        mode: PromptMode.DEFAULT,
+      }
     );
-    return { success: true, paymentId: payment.id };  // then POST to backend for verification
+    return { success: true, paymentId: payment.id }; // then POST to backend for verification
   } catch (e) {
-    return mapSquareError(e);                         // cancelled / declined / session / network
+    return mapSquareError(e); // cancelled / declined / session / network
   } finally {
     inProgress = false;
   }
@@ -541,7 +570,7 @@ export async function startCardPayment(amountCents: number) {
 - Fetches `/square/session`, validates `authorizationCode` and `locationId` are non-empty strings.
 - **Rejects if `session.applicationId !== config.squareApplicationId`** (sandbox build pointed at a production backend, or the reverse).
 - Reuses the current SDK authorization only if it's for the same location and has more than 10 minutes left before `expiresAt`.
-- If another account is authorised, calls `deauthorize()` first. The SDK's `authorize()` returns early when *any* account is authorised.
+- If another account is authorised, calls `deauthorize()` first. The SDK's `authorize()` returns early when _any_ account is authorised.
 - Wraps `authorize()` / `deauthorize()` in a **20 s timeout**. The native calls have none and can hang forever.
 - Uses a generation counter so an `authorize()` that finishes after logout is rolled back.
 
@@ -556,29 +585,29 @@ The app's "success" is only a claim. Before marking an invoice paid, the backend
 5. Records the payment with the **verified** amount and Square payment ID as a reference, under a **unique constraint on the payment ID** so a retried request can't record it twice.
 6. Returns a clear 4xx for mismatches, and `409` when the merchant must reconnect.
 
-| Flow | Mobile | Backend |
-| --- | --- | --- |
-| Success | `paymentId` → `POST /square/payments` → show receipt | Verify → record → `200` |
-| Declined / invalid card | Show the mapped message; stay on screen | Nothing recorded |
-| Cancelled by user | Quiet "Payment cancelled"; **keep** the SDK session | Nothing recorded |
-| Network error during SDK call | "Could not process, try again"; clear the cached session | — |
+| Flow                                                  | Mobile                                                                                         | Backend                                   |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Success                                               | `paymentId` → `POST /square/payments` → show receipt                                           | Verify → record → `200`                   |
+| Declined / invalid card                               | Show the mapped message; stay on screen                                                        | Nothing recorded                          |
+| Cancelled by user                                     | Quiet "Payment cancelled"; **keep** the SDK session                                            | Nothing recorded                          |
+| Network error during SDK call                         | "Could not process, try again"; clear the cached session                                       | —                                         |
 | App crashes after Square success, before backend call | On next open, list unreconciled payments, or rely on webhooks (`payment.updated`) to reconcile | Reconcile by `paymentId` / `reference_id` |
-| Session expired / revoked | Clear the session, re-authorize once, else "Reconnect Square" | `/session` → `409` |
+| Session expired / revoked                             | Clear the session, re-authorize once, else "Reconnect Square"                                  | `/session` → `409`                        |
 
 ### 5.7 Error mapping
 
 Map SDK and Square error codes to translated messages. Never show raw codes. Project example groups:
 
-| Group | Codes (examples) | User message |
-| --- | --- | --- |
-| Declined | `GENERIC_DECLINE`, `CARD_DECLINED`, `INSUFFICIENT_FUNDS` | Card declined, try another |
-| Invalid card | `CVV_FAILURE`, `INVALID_EXPIRATION`, `CARD_EXPIRED` | Check card details |
-| Session | `ACCESS_TOKEN_EXPIRED`, `ACCESS_TOKEN_REVOKED`, `UNAUTHORIZED` | Session expired, try again / reconnect |
-| Network | `NO_NETWORK`, `TIMED_OUT` | Couldn't process, try again |
-| Authorization | `LOCATION_NOT_ACTIVATED_FOR_CARD_PROCESSING` | Location not activated for card payments |
-| | `DEVICE_TIME_DOES_NOT_MATCH_SERVER_TIME` | Fix device date and time |
-| | `UNSUPPORTED_COUNTRY` | Not supported in this country |
-| Cancel | any code containing `CANCEL` | Payment cancelled |
+| Group         | Codes (examples)                                               | User message                             |
+| ------------- | -------------------------------------------------------------- | ---------------------------------------- |
+| Declined      | `GENERIC_DECLINE`, `CARD_DECLINED`, `INSUFFICIENT_FUNDS`       | Card declined, try another               |
+| Invalid card  | `CVV_FAILURE`, `INVALID_EXPIRATION`, `CARD_EXPIRED`            | Check card details                       |
+| Session       | `ACCESS_TOKEN_EXPIRED`, `ACCESS_TOKEN_REVOKED`, `UNAUTHORIZED` | Session expired, try again / reconnect   |
+| Network       | `NO_NETWORK`, `TIMED_OUT`                                      | Couldn't process, try again              |
+| Authorization | `LOCATION_NOT_ACTIVATED_FOR_CARD_PROCESSING`                   | Location not activated for card payments |
+|               | `DEVICE_TIME_DOES_NOT_MATCH_SERVER_TIME`                       | Fix device date and time                 |
+|               | `UNSUPPORTED_COUNTRY`                                          | Not supported in this country            |
+| Cancel        | any code containing `CANCEL`                                   | Payment cancelled                        |
 
 ### 5.8 Environment separation
 
@@ -595,13 +624,13 @@ Map SDK and Square error codes to translated messages. Never show raw codes. Pro
 
 ### 5.10 Platform requirements (project example, Mobile Payments SDK 2.6.x)
 
-| | Requirement |
-| --- | --- |
-| RN wrapper | `mobile-payments-sdk-react-native` (pin exact version; native SDK `2.6.x`) |
-| Android | `minSdk 28`, `compileSdk 36`, Kotlin `2.2.21`, AGP `≥ 8.9.1`, repo `https://sdk.squareup.com/public/android/` |
-| iOS | Deployment target `≥ 16`, CocoaPods `SquareMobilePaymentsSDK` + `MockReaderUI` |
-| Runtime permissions | Location (precise) on both; Android also Bluetooth scan/connect (API 31+), record audio, read phone state |
-| Old/new architecture | Project example runs old architecture. Check the wrapper's support before enabling the new architecture |
+|                      | Requirement                                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------------------- |
+| RN wrapper           | `mobile-payments-sdk-react-native` (pin exact version; native SDK `2.6.x`)                                    |
+| Android              | `minSdk 28`, `compileSdk 36`, Kotlin `2.2.21`, AGP `≥ 8.9.1`, repo `https://sdk.squareup.com/public/android/` |
+| iOS                  | Deployment target `≥ 16`, CocoaPods `SquareMobilePaymentsSDK` + `MockReaderUI`                                |
+| Runtime permissions  | Location (precise) on both; Android also Bluetooth scan/connect (API 31+), record audio, read phone state     |
+| Old/new architecture | Project example runs old architecture. Check the wrapper's support before enabling the new architecture       |
 
 Check Square's current SDK release notes before upgrading. Square SDK upgrades often require new minimum Android/iOS/Kotlin versions, so plan them as a native upgrade ([04 §4](04-mobile-build-release-and-store-deployment.md#4-android)). The older Square Reader SDK is deprecated; new projects should use the Mobile Payments SDK.
 
@@ -617,10 +646,10 @@ See [05 §9](05-mobile-troubleshooting-and-best-practices.md#9-square-payments) 
 
 **Project example:** `expo-notifications` obtains the **native device token** (`getDevicePushTokenAsync()`, so an FCM token on Android and an APNs token on iOS), meant for a backend that sends through FCM/APNs directly.
 
-| Option | Token | Backend sends via | Use when |
-| --- | --- | --- | --- |
-| Expo push service | `getExpoPushTokenAsync({ projectId })` → `ExponentPushToken[…]` | Expo Push API | Simplest; one API for both platforms |
-| Native tokens | `getDevicePushTokenAsync()` | FCM HTTP v1 (Android **and** iOS via Firebase) or APNs directly | You already use Firebase or need full control |
+| Option            | Token                                                           | Backend sends via                                               | Use when                                      |
+| ----------------- | --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Expo push service | `getExpoPushTokenAsync({ projectId })` → `ExponentPushToken[…]` | Expo Push API                                                   | Simplest; one API for both platforms          |
+| Native tokens     | `getDevicePushTokenAsync()`                                     | FCM HTTP v1 (Android **and** iOS via Firebase) or APNs directly | You already use Firebase or need full control |
 
 Pick one per project and stick to it. The backend must know which token type it's storing.
 
@@ -640,7 +669,9 @@ Pick one per project and stick to it. The backend must know which token type it'
 
 ```ts
 await Notifications.setNotificationChannelAsync('default', {
-  name: 'Default', importance: Notifications.AndroidImportance.MAX, vibrationPattern: [0, 250, 250, 250],
+  name: 'Default',
+  importance: Notifications.AndroidImportance.MAX,
+  vibrationPattern: [0, 250, 250, 250],
 });
 ```
 
@@ -650,7 +681,7 @@ await Notifications.setNotificationChannelAsync('default', {
 
 ```ts
 export async function registerForPush(): Promise<string | null> {
-  if (!Device.isDevice) return null;                                 // simulators can't get tokens
+  if (!Device.isDevice) return null; // simulators can't get tokens
   if (Platform.OS === 'android' && Platform.Version >= 33) {
     const r = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
     if (r !== PermissionsAndroid.RESULTS.GRANTED) return null;
@@ -698,7 +729,11 @@ POST /api/v1/devices
 
 ```ts
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: false }),
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
 });
 
 useEffect(() => {
@@ -706,10 +741,15 @@ useEffect(() => {
     queryClient.invalidateQueries({ queryKey: queryKeyFor(n.request.content.data) });
   });
   const response = Notifications.addNotificationResponseReceivedListener((r) => {
-    routeFromNotification(r.notification.request.content.data);   // navigationRef.navigate(...)
+    routeFromNotification(r.notification.request.content.data); // navigationRef.navigate(...)
   });
-  Notifications.getLastNotificationResponseAsync().then((r) => r && routeFromNotification(r.notification.request.content.data)); // cold start
-  return () => { received.remove(); response.remove(); };
+  Notifications.getLastNotificationResponseAsync().then(
+    (r) => r && routeFromNotification(r.notification.request.content.data)
+  ); // cold start
+  return () => {
+    received.remove();
+    response.remove();
+  };
 }, []);
 ```
 
@@ -745,14 +785,14 @@ Used for live updates the user shouldn't have to refresh: new or updated jobs, a
 // services/realtimeService.ts — module-level singleton, not per screen
 socket = io(socketUrl, {
   transports: ['websocket', 'polling'],
-  tryAllTransports: true,          // actually fall back to polling if the WS upgrade fails
+  tryAllTransports: true, // actually fall back to polling if the WS upgrade fails
   reconnection: true,
-  reconnectionAttempts: Infinity,  // mobile networks drop constantly; never give up permanently
+  reconnectionAttempts: Infinity, // mobile networks drop constantly; never give up permanently
   reconnectionDelay: 1000,
   reconnectionDelayMax: 15000,
-  randomizationFactor: 0.5,        // jitter so thousands of clients don't reconnect at once
+  randomizationFactor: 0.5, // jitter so thousands of clients don't reconnect at once
   timeout: 60000,
-  auth: (cb) => cb({ token: getAccessToken() }),   // general recommendation (see 7.3)
+  auth: (cb) => cb({ token: getAccessToken() }), // general recommendation (see 7.3)
 });
 ```
 
@@ -788,7 +828,14 @@ logout ─► emit leave (best effort) ─► socket.off(); socket.io.off(); soc
 Payload shape:
 
 ```json
-{ "eventId": "uuid", "type": "order:cleared", "companyId": "c_1", "orderId": "1042", "at": "2026-03-01T14:00:00Z", "data": { } }
+{
+  "eventId": "uuid",
+  "type": "order:cleared",
+  "companyId": "c_1",
+  "orderId": "1042",
+  "at": "2026-03-01T14:00:00Z",
+  "data": {}
+}
 ```
 
 ### 7.6 Duplicates and ordering
@@ -806,7 +853,7 @@ export function useRealtime(callbacks: RealtimeCallbacks) {
   useEffect(() => {
     realtimeService.addCallbacks(callbacks);
     return () => realtimeService.removeCallbacks(callbacks);
-  }, [callbacks]);   // memoise callbacks in the caller
+  }, [callbacks]); // memoise callbacks in the caller
 }
 ```
 
@@ -828,14 +875,14 @@ Never call `socket.on(...)` directly in a component without a matching `off` in 
 
 ## 8. Other integrations
 
-| Integration | Project example | Notes |
-| --- | --- | --- |
-| Deep links | Custom schemes registered in `Info.plist` / manifest | Unique scheme per environment; Universal/App Links for production OAuth returns (§3.3) |
-| Background tasks | `expo-task-manager` (location, notifications) | Define at module scope in `index.ts` |
-| Camera / scanning | `expo-camera`, `react-native-vision-camera` (code scanner), document scanner, on-device OCR | Each adds native permissions and build config. One camera library is easier to maintain than two |
-| File uploads | `FormData` through the shared axios client | Compress first; don't force `Content-Type`; increase timeout for uploads |
-| Remote support / co-browse SDK | Third-party SDK initialised at startup | Mask sensitive fields; start only with user consent; generate dSYMs for crash symbolication |
-| Third-party data APIs | Called directly with an API key from the app | **Move behind the backend** (§1.2) |
-| Support webhook | Webhook URL in the app bundle | **Move behind the backend**. Anyone can extract and spam a webhook URL |
-| Crash reporting / analytics | Not present (local last-crash logger only) | Add Sentry or Crashlytics before scaling ([05 §13](05-mobile-troubleshooting-and-best-practices.md#13-production-best-practices)) |
-| Dev tooling | Reactotron, loaded only under `__DEV__` | Never ship it in release |
+| Integration                    | Project example                                                                             | Notes                                                                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Deep links                     | Custom schemes registered in `Info.plist` / manifest                                        | Unique scheme per environment; Universal/App Links for production OAuth returns (§3.3)                                            |
+| Background tasks               | `expo-task-manager` (location, notifications)                                               | Define at module scope in `index.ts`                                                                                              |
+| Camera / scanning              | `expo-camera`, `react-native-vision-camera` (code scanner), document scanner, on-device OCR | Each adds native permissions and build config. One camera library is easier to maintain than two                                  |
+| File uploads                   | `FormData` through the shared axios client                                                  | Compress first; don't force `Content-Type`; increase timeout for uploads                                                          |
+| Remote support / co-browse SDK | Third-party SDK initialised at startup                                                      | Mask sensitive fields; start only with user consent; generate dSYMs for crash symbolication                                       |
+| Third-party data APIs          | Called directly with an API key from the app                                                | **Move behind the backend** (§1.2)                                                                                                |
+| Support webhook                | Webhook URL in the app bundle                                                               | **Move behind the backend**. Anyone can extract and spam a webhook URL                                                            |
+| Crash reporting / analytics    | Not present (local last-crash logger only)                                                  | Add Sentry or Crashlytics before scaling ([05 §13](05-mobile-troubleshooting-and-best-practices.md#13-production-best-practices)) |
+| Dev tooling                    | Reactotron, loaded only under `__DEV__`                                                     | Never ship it in release                                                                                                          |

@@ -18,24 +18,40 @@
   }
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font:
+    16px/1.6 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
-a { color: var(--link); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 
 .site-header {
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
-.site-header a { color: var(--text); font-weight: 600; }
+.site-header a {
+  color: var(--text);
+  font-weight: 600;
+}
 
 .doc {
   max-width: 860px;
@@ -44,12 +60,29 @@ a:hover { text-decoration: underline; }
   overflow-wrap: break-word;
 }
 
-.doc h1, .doc h2, .doc h3, .doc h4 { line-height: 1.25; margin: 1.6em 0 0.6em; }
-.doc h1 { font-size: 2em; margin-top: 0; }
-.doc h1, .doc h2 { padding-bottom: 0.3em; border-bottom: 1px solid var(--border); }
-.doc h2 { font-size: 1.5em; }
+.doc h1,
+.doc h2,
+.doc h3,
+.doc h4 {
+  line-height: 1.25;
+  margin: 1.6em 0 0.6em;
+}
+.doc h1 {
+  font-size: 2em;
+  margin-top: 0;
+}
+.doc h1,
+.doc h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+.doc h2 {
+  font-size: 1.5em;
+}
 
-.doc img { max-width: 100%; }
+.doc img {
+  max-width: 100%;
+}
 
 .doc blockquote {
   margin: 0 0 1em;
@@ -59,7 +92,12 @@ a:hover { text-decoration: underline; }
 }
 
 .doc code {
-  font: 0.875em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font:
+    0.875em ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
   background: var(--surface);
   padding: 0.2em 0.4em;
   border-radius: 6px;
@@ -72,7 +110,11 @@ a:hover { text-decoration: underline; }
   overflow-x: auto;
 }
 
-.doc pre code { padding: 0; background: none; font-size: 0.85em; }
+.doc pre code {
+  padding: 0;
+  background: none;
+  font-size: 0.85em;
+}
 
 .doc table {
   display: block;
@@ -83,10 +125,26 @@ a:hover { text-decoration: underline; }
   margin-bottom: 1em;
 }
 
-.doc th, .doc td { padding: 6px 13px; border: 1px solid var(--border); }
-.doc th { background: var(--surface); }
+.doc th,
+.doc td {
+  padding: 6px 13px;
+  border: 1px solid var(--border);
+}
+.doc th {
+  background: var(--surface);
+}
 
-.doc hr { border: 0; border-top: 1px solid var(--border); margin: 24px 0; }
+.doc hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
 
-.not-found { text-align: center; padding-top: 48px; }
-.not-found h1 { border: 0; font-size: 3em; }
+.not-found {
+  text-align: center;
+  padding-top: 48px;
+}
+.not-found h1 {
+  border: 0;
+  font-size: 3em;
+}

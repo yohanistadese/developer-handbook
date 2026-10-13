@@ -14,5 +14,5 @@ createRoot(document.getElementById('root')).render(
         <Route path="*" element={<DocPage />} />
       </Routes>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );

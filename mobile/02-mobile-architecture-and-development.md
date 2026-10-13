@@ -35,13 +35,13 @@ src/
 
 **Dependency direction:** `screens → components / hooks → api / services → config`. Services and API modules never import screens. Anything used by two or more screens moves out of `screens/`.
 
-| Layer | Responsibility | Must not |
-| --- | --- | --- |
-| Screen | Layout, wiring hooks to components, navigation | Call axios directly or hold business rules |
-| Component | Presentation, local UI state | Fetch data (except clearly named container components) |
-| Hook | Reusable stateful logic, React Query wrappers | Touch native SDKs directly when a service exists |
-| Service | Long-lived logic and SDK wrappers (socket, payments, location) | Render UI (it may raise an `Alert`) |
-| API | HTTP requests, response shape | Show messages to the user |
+| Layer     | Responsibility                                                 | Must not                                               |
+| --------- | -------------------------------------------------------------- | ------------------------------------------------------ |
+| Screen    | Layout, wiring hooks to components, navigation                 | Call axios directly or hold business rules             |
+| Component | Presentation, local UI state                                   | Fetch data (except clearly named container components) |
+| Hook      | Reusable stateful logic, React Query wrappers                  | Touch native SDKs directly when a service exists       |
+| Service   | Long-lived logic and SDK wrappers (socket, payments, location) | Render UI (it may raise an `Alert`)                    |
+| API       | HTTP requests, response shape                                  | Show messages to the user                              |
 
 ---
 
@@ -86,7 +86,7 @@ All requests go through `src/api/config.ts`. Never call `axios.create` or `fetch
 
 ```ts
 const axiosInstance = axios.create({
-  baseURL: config.apiUrl,        // from env, see guide 03
+  baseURL: config.apiUrl, // from env, see guide 03
   timeout: 15000,
 });
 
@@ -141,7 +141,7 @@ new QueryClient({
       retryDelay: (n) => Math.min(1000 * 2 ** n, 30_000),
       refetchOnWindowFocus: false,
       refetchOnReconnect: false, // Android flips offline↔online often; `true` caused request floods
-      networkMode: 'always',     // let the NetInfo interceptor decide, not navigator.onLine
+      networkMode: 'always', // let the NetInfo interceptor decide, not navigator.onLine
     },
     mutations: { retry: 1, networkMode: 'always' },
   },
@@ -160,7 +160,8 @@ React Query passes an `AbortSignal` to `queryFn`. Forward it for searches and la
 ```ts
 useQuery({
   queryKey: ['search', term],
-  queryFn: ({ signal }) => api.get('/api/v1/search', { params: { q: term }, signal }).then(r => r.data),
+  queryFn: ({ signal }) =>
+    api.get('/api/v1/search', { params: { q: term }, signal }).then((r) => r.data),
   enabled: term.length >= 2,
 });
 ```
@@ -175,14 +176,14 @@ For non-query requests (typeahead, uploads), create an `AbortController` and abo
 
 **Project example** `normalizeApiError(error, fallback)` returns `{ message, status, isNetworkError, isAuthError }`, and the message is always a translation:
 
-| Condition | Message key |
-| --- | --- |
-| `NETWORK_OFFLINE` | `error.offline` |
-| Timeout (`ECONNABORTED`) | `error.timeout` |
-| No response (DNS, server down) | `error.serverUnavailable` |
-| 401 / 403 / 404 | `error.unauthorized` / `error.forbidden` / `error.notFound` |
-| ≥ 500 | `error.serverError` (**never** show backend internals) |
-| 4xx with body | the backend's validation message (`message`, `detail`, `error`, field errors), otherwise the fallback |
+| Condition                      | Message key                                                                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `NETWORK_OFFLINE`              | `error.offline`                                                                                       |
+| Timeout (`ECONNABORTED`)       | `error.timeout`                                                                                       |
+| No response (DNS, server down) | `error.serverUnavailable`                                                                             |
+| 401 / 403 / 404                | `error.unauthorized` / `error.forbidden` / `error.notFound`                                           |
+| ≥ 500                          | `error.serverError` (**never** show backend internals)                                                |
+| 4xx with body                  | the backend's validation message (`message`, `detail`, `error`, field errors), otherwise the fallback |
 
 Log full details for developers separately (`logApiError(context, error)`). In release builds, log only `message`, `status` and `url`.
 
@@ -198,19 +199,21 @@ Log full details for developers separately (`logApiError(context, error)`). In r
 
 ## 5. State management
 
-| Kind of state | Tool | Example |
-| --- | --- | --- |
-| Server data | React Query | lists, details, lookups |
+| Kind of state                 | Tool                                   | Example                                          |
+| ----------------------------- | -------------------------------------- | ------------------------------------------------ |
+| Server data                   | React Query                            | lists, details, lookups                          |
 | Session / global client state | Redux Toolkit (persisted where needed) | access token, user profile, theme, feature flags |
-| Cross-screen UI state | React Context | incoming-event banner, tab state |
-| Local UI state | `useState` / `useReducer` | form inputs, modal visibility |
-| Long-lived connections | Module-level service singletons | socket, payment SDK session |
+| Cross-screen UI state         | React Context                          | incoming-event banner, tab state                 |
+| Local UI state                | `useState` / `useReducer`              | form inputs, modal visibility                    |
+| Long-lived connections        | Module-level service singletons        | socket, payment SDK session                      |
 
 Don't copy server data into Redux. Persist only what has to survive a restart. **Project example** persists `login`, `theme` and `font`, and uses a versioned persist config with a migration so stored theme data is rebuilt when the theme schema changes:
 
 ```ts
 const themePersistConfig = {
-  key: 'theme', storage, version: 2,
+  key: 'theme',
+  storage,
+  version: 2,
   migrate: (state) => Promise.resolve({ ...state, currentTheme: defaultTheme }),
 };
 ```
@@ -251,12 +254,12 @@ return (
 
 ### 6.4 Tokens and storage
 
-| Data | Store in |
-| --- | --- |
-| Access / refresh tokens | **General recommendation:** Keychain/Keystore (`expo-secure-store`) |
-| Non-sensitive preferences (theme, language, last tab) | AsyncStorage |
-| Cached server data | React Query (memory), or a persister for offline use |
-| Payment credentials / card data | **Never** on the device (handled by the payment SDK) |
+| Data                                                  | Store in                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------- |
+| Access / refresh tokens                               | **General recommendation:** Keychain/Keystore (`expo-secure-store`) |
+| Non-sensitive preferences (theme, language, last tab) | AsyncStorage                                                        |
+| Cached server data                                    | React Query (memory), or a persister for offline use                |
+| Payment credentials / card data                       | **Never** on the device (handled by the payment SDK)                |
 
 > **Project example:** the session (including the access token) is persisted with redux-persist on AsyncStorage, which isn't encrypted. That works, but for new projects keep tokens in `expo-secure-store` and persist only non-sensitive state.
 
@@ -301,12 +304,12 @@ return <OrderList data={data} refreshing={isRefetching} onRefresh={refetch} />;
 
 ## 9. Logging and debugging
 
-| Tool | Use |
-| --- | --- |
-| Reactotron (dev only, `require`d under `__DEV__`) | API calls, Redux state, custom logs, socket events |
-| React Native DevTools / Hermes debugger (press `j` in Metro) | Breakpoints, console |
-| Xcode console / `adb logcat` | Native crashes, SDK logs, release-build issues |
-| Activity log (project example `pushActivityLog`) | An in-app log of socket, background and system events for field debugging |
+| Tool                                                         | Use                                                                       |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| Reactotron (dev only, `require`d under `__DEV__`)            | API calls, Redux state, custom logs, socket events                        |
+| React Native DevTools / Hermes debugger (press `j` in Metro) | Breakpoints, console                                                      |
+| Xcode console / `adb logcat`                                 | Native crashes, SDK logs, release-build issues                            |
+| Activity log (project example `pushActivityLog`)             | An in-app log of socket, background and system events for field debugging |
 
 Rules:
 
@@ -336,7 +339,7 @@ Rules:
 <FlatList
   data={items}
   keyExtractor={(item) => String(item.id)}
-  renderItem={renderItem}              // stable, memoised
+  renderItem={renderItem} // stable, memoised
   getItemLayout={fixedHeight ? (_, i) => ({ length: H, offset: H * i, index: i }) : undefined}
   initialNumToRender={10}
   windowSize={7}
@@ -385,21 +388,21 @@ Memoise markers, avoid re-creating the `region` object on every render, and limi
 ## 12. Platform-specific code and iOS vs Android differences
 
 ```ts
-Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-Platform.select({ ios: 'padding', android: 'height' })
+Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT;
+Platform.select({ ios: 'padding', android: 'height' });
 // or file suffixes: Component.ios.tsx / Component.android.tsx
 ```
 
-| Area | iOS | Android |
-| --- | --- | --- |
-| Permissions | Prompt once; afterwards only Settings | Can re-prompt; "Don't ask again" → `NEVER_ASK_AGAIN` → Settings |
-| Notifications permission | Always requested | Runtime permission only on API 33+ (`POST_NOTIFICATIONS`) |
-| Background location | "Always" upgrade prompt, `UIBackgroundModes: location` | `ACCESS_BACKGROUND_LOCATION` + **foreground service** notification; can't start the service from the background on Android 12+ |
-| Maps provider | Apple Maps by default; Google needs the Google Maps SDK + key | Google Maps (needs key) |
-| Back navigation | Swipe | Hardware back button. Handle it in modals and flows |
-| Networking | ATS blocks plain HTTP by default | Cleartext blocked by default (API 28+) |
-| WebSockets | Reliable | Some dev-build network inspectors break the WS upgrade → allow polling fallback ([03 §7](03-mobile-environment-and-integrations.md#7-sockets-and-realtime)) |
-| Status / nav bar | Status bar style only | Status **and** navigation bar color (`expo-navigation-bar`) |
+| Area                     | iOS                                                           | Android                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Permissions              | Prompt once; afterwards only Settings                         | Can re-prompt; "Don't ask again" → `NEVER_ASK_AGAIN` → Settings                                                                                             |
+| Notifications permission | Always requested                                              | Runtime permission only on API 33+ (`POST_NOTIFICATIONS`)                                                                                                   |
+| Background location      | "Always" upgrade prompt, `UIBackgroundModes: location`        | `ACCESS_BACKGROUND_LOCATION` + **foreground service** notification; can't start the service from the background on Android 12+                              |
+| Maps provider            | Apple Maps by default; Google needs the Google Maps SDK + key | Google Maps (needs key)                                                                                                                                     |
+| Back navigation          | Swipe                                                         | Hardware back button. Handle it in modals and flows                                                                                                         |
+| Networking               | ATS blocks plain HTTP by default                              | Cleartext blocked by default (API 28+)                                                                                                                      |
+| WebSockets               | Reliable                                                      | Some dev-build network inspectors break the WS upgrade → allow polling fallback ([03 §7](03-mobile-environment-and-integrations.md#7-sockets-and-realtime)) |
+| Status / nav bar         | Status bar style only                                         | Status **and** navigation bar color (`expo-navigation-bar`)                                                                                                 |
 
 ---
 
@@ -408,7 +411,9 @@ Platform.select({ ios: 'padding', android: 'height' })
 Pattern: **check → explain (if needed) → request → handle denial → offer Settings**.
 
 ```ts
-const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+const result = await PermissionsAndroid.request(
+  PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+);
 if (result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
   Alert.alert(t('permissions.locationTitle'), t('permissions.locationMessage'), [
     { text: t('common.cancel'), style: 'cancel' },

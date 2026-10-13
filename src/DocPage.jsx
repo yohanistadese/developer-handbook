@@ -47,7 +47,8 @@ export default function DocPage() {
 
   useEffect(() => {
     if (doc && content === null) return;
-    document.title = content?.match(/^#\s+(.+)$/m)?.[1] ?? (doc ? 'Developer Handbook' : 'Page not found');
+    document.title =
+      content?.match(/^#\s+(.+)$/m)?.[1] ?? (doc ? 'Developer Handbook' : 'Page not found');
     const target = hash && document.getElementById(decodeURIComponent(hash.slice(1)));
     if (target) target.scrollIntoView();
     else window.scrollTo(0, 0);
@@ -63,7 +64,9 @@ export default function DocPage() {
       return <a href={resolveAsset(path) ?? href} {...props} />;
     },
     img({ src = '', node, ...props }) {
-      const resolved = isExternal(src) ? src : (resolveAsset(resolvePath(src, doc.file).path) ?? src);
+      const resolved = isExternal(src)
+        ? src
+        : (resolveAsset(resolvePath(src, doc.file).path) ?? src);
       return <img src={resolved} {...props} />;
     },
   };

@@ -59,12 +59,12 @@ npx expo install --check              # versions compatible with the Expo SDK?
 
 ### 2.4 Port 8081 in use / app can't connect to Metro
 
-| Symptom | Fix |
-| --- | --- |
-| `Port 8081 already in use` | `lsof -i :8081` → kill the process, or `expo start --port 8082` |
-| Physical Android device can't reach Metro | `adb reverse tcp:8081 tcp:8081` |
-| Physical iPhone can't reach Metro | Same Wi-Fi; disable VPN; check the Mac firewall; or `expo start --tunnel` |
-| Dev client shows "No development servers found" | Enter the URL manually: `http://<mac-ip>:8081` |
+| Symptom                                         | Fix                                                                       |
+| ----------------------------------------------- | ------------------------------------------------------------------------- |
+| `Port 8081 already in use`                      | `lsof -i :8081` → kill the process, or `expo start --port 8082`           |
+| Physical Android device can't reach Metro       | `adb reverse tcp:8081 tcp:8081`                                           |
+| Physical iPhone can't reach Metro               | Same Wi-Fi; disable VPN; check the Mac firewall; or `expo start --tunnel` |
+| Dev client shows "No development servers found" | Enter the URL manually: `http://<mac-ip>:8081`                            |
 
 ---
 
@@ -112,13 +112,13 @@ rm -rf ~/.gradle/caches/                             # last resort; slow re-down
 
 ### 3.5 Emulator and device installation issues
 
-| Symptom | Fix |
-| --- | --- |
-| `INSTALL_FAILED_NO_MATCHING_ABIS` | Release builds limited to `arm64-v8a` (project example). Use an arm64 emulator or a physical device |
-| `adb devices` empty / `unauthorized` | Re-plug, accept the RSA prompt; `adb kill-server && adb start-server` |
-| Emulator very slow / won't boot | Cold boot from Device Manager; wipe data; enough RAM; Apple Silicon → arm64 images |
-| `SDK location not found` | `ANDROID_HOME` set, or `android/local.properties` with `sdk.dir=/Users/you/Library/Android/sdk` |
-| Out of memory during build | `org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m` in `gradle.properties` (project example) |
+| Symptom                              | Fix                                                                                                 |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `INSTALL_FAILED_NO_MATCHING_ABIS`    | Release builds limited to `arm64-v8a` (project example). Use an arm64 emulator or a physical device |
+| `adb devices` empty / `unauthorized` | Re-plug, accept the RSA prompt; `adb kill-server && adb start-server`                               |
+| Emulator very slow / won't boot      | Cold boot from Device Manager; wipe data; enough RAM; Apple Silicon → arm64 images                  |
+| `SDK location not found`             | `ANDROID_HOME` set, or `android/local.properties` with `sdk.dir=/Users/you/Library/Android/sdk`     |
+| Out of memory during build           | `org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m` in `gradle.properties` (project example)  |
 
 ---
 
@@ -136,18 +136,19 @@ cd ios && pod install --repo-update && cd ..
 pnpm pods:clean                   # deintegrate + reinstall (removes Pods and Podfile.lock)
 ```
 
-  Set `ios.deploymentTarget` in `Podfile.properties.json` (or `expo-build-properties`) to at least what every pod needs.
+Set `ios.deploymentTarget` in `Podfile.properties.json` (or `expo-build-properties`) to at least what every pod needs.
+
 - **Prevent:** run `pod install` after any dependency change with native code. Commit the Podfile changes.
 
 ### 4.2 Xcode build errors
 
-| Error | Fix |
-| --- | --- |
-| `No such module` / `'React/RCTBridge.h' not found` | Open `.xcworkspace`, not `.xcodeproj`; `pnpm pods` |
-| Errors after Xcode upgrade | Clean build folder (⇧⌘K); `rm -rf ~/Library/Developer/Xcode/DerivedData/ProjectName-*`; `pnpm pods:clean` |
-| `Command PhaseScriptExecution failed` | Expand the log in the Report navigator. Usually a Node path issue (`ios/.xcode.env.local` → `export NODE_BINARY=$(command -v node)`) or a bundling error |
-| `Sandbox: rsync deny` / `bash: Operation not permitted` | Build setting `ENABLE_USER_SCRIPT_SANDBOXING = NO` for the app target |
-| Missing dSYM warnings on upload | `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` for Release (the project example's Podfile `post_install` sets this, and generates a missing dSYM for one binary SDK) |
+| Error                                                   | Fix                                                                                                                                                                |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `No such module` / `'React/RCTBridge.h' not found`      | Open `.xcworkspace`, not `.xcodeproj`; `pnpm pods`                                                                                                                 |
+| Errors after Xcode upgrade                              | Clean build folder (⇧⌘K); `rm -rf ~/Library/Developer/Xcode/DerivedData/ProjectName-*`; `pnpm pods:clean`                                                          |
+| `Command PhaseScriptExecution failed`                   | Expand the log in the Report navigator. Usually a Node path issue (`ios/.xcode.env.local` → `export NODE_BINARY=$(command -v node)`) or a bundling error           |
+| `Sandbox: rsync deny` / `bash: Operation not permitted` | Build setting `ENABLE_USER_SCRIPT_SANDBOXING = NO` for the app target                                                                                              |
+| Missing dSYM warnings on upload                         | `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` for Release (the project example's Podfile `post_install` sets this, and generates a missing dSYM for one binary SDK) |
 
 ### 4.3 Signing, provisioning and certificates
 
@@ -165,14 +166,14 @@ See [03 §3.1](03-mobile-environment-and-integrations.md#31-ios-schemes-project-
 
 ## 5. EAS build failures
 
-| Symptom | Cause / fix |
-| --- | --- |
-| Fails at "Install dependencies" | Lockfile out of sync → `pnpm install` locally, commit `pnpm-lock.yaml`; pnpm version → `packageManager` field |
-| Fails at "Prebuild" | Config plugin error in `app.config.js`; reproduce with `npx expo prebuild --no-install` in a throwaway copy |
-| Works locally, fails on EAS | Files ignored by `.gitignore`/`.easignore` that the build needs; different Node version (pin `node` in `eas.json`); env var only in your local `.env` |
-| Env values empty in the build | Variable not in the profile's EAS environment (`eas env:list --environment preview`); `secret` vs `sensitive` doesn't affect builds, only `env:pull` |
-| `appVersionSource remote` errors | Initialise with `eas build:version:set` |
-| Credentials errors | `eas credentials` → validate or regenerate; Apple account access for the EAS user |
+| Symptom                          | Cause / fix                                                                                                                                           |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fails at "Install dependencies"  | Lockfile out of sync → `pnpm install` locally, commit `pnpm-lock.yaml`; pnpm version → `packageManager` field                                         |
+| Fails at "Prebuild"              | Config plugin error in `app.config.js`; reproduce with `npx expo prebuild --no-install` in a throwaway copy                                           |
+| Works locally, fails on EAS      | Files ignored by `.gitignore`/`.easignore` that the build needs; different Node version (pin `node` in `eas.json`); env var only in your local `.env` |
+| Env values empty in the build    | Variable not in the profile's EAS environment (`eas env:list --environment preview`); `secret` vs `sensitive` doesn't affect builds, only `env:pull`  |
+| `appVersionSource remote` errors | Initialise with `eas build:version:set`                                                                                                               |
+| Credentials errors               | `eas credentials` → validate or regenerate; Apple account access for the EAS user                                                                     |
 
 Always read the full log of the **first failing phase** on expo.dev. Run `eas build --local` to reproduce on your machine.
 
@@ -202,11 +203,11 @@ Always read the full log of the **first failing phase** on expo.dev. Run `eas bu
 
 ### 7.1 Local backend unreachable
 
-| Client | Use |
-| --- | --- |
-| iOS Simulator | `http://localhost:PORT` |
+| Client           | Use                                                                      |
+| ---------------- | ------------------------------------------------------------------------ |
+| iOS Simulator    | `http://localhost:PORT`                                                  |
 | Android Emulator | `http://10.0.2.2:PORT`, or `adb reverse tcp:PORT tcp:PORT` + `localhost` |
-| Physical device | `http://<mac-lan-ip>:PORT` (same Wi-Fi), or a tunnel |
+| Physical device  | `http://<mac-lan-ip>:PORT` (same Wi-Fi), or a tunnel                     |
 
 Plain `http://` is blocked by default: iOS ATS and Android cleartext policy (API 28+). For local development only, allow it in debug builds. Never ship cleartext exceptions in release.
 
@@ -224,14 +225,14 @@ Plain `http://` is blocked by default: iOS ATS and Android cleartext policy (API
 
 ### 7.4 Authentication issues
 
-| Symptom | Cause / fix |
-| --- | --- |
-| First requests after login return 401 | Auth header set in a parent effect, after children already fetched → set it before children mount ([02 §6.1](02-mobile-architecture-and-development.md#61-auth-gated-navigator)) |
-| Random logouts | Backend returns 401 for non-auth errors, or token expiry too short → check codes; add refresh tokens |
-| Logout loop / multiple logout animations | Concurrent 401s each trigger logout → single-flight `performLogout` |
-| Wrong password logs the user "out" | Login endpoint excluded from the auth-expired interceptor |
-| Previous user's data visible after re-login | `queryClient.clear()` and store reset on logout |
-| Token survives uninstall on iOS | Keychain items persist across reinstalls → clear secure storage on the first launch after install |
+| Symptom                                     | Cause / fix                                                                                                                                                                      |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First requests after login return 401       | Auth header set in a parent effect, after children already fetched → set it before children mount ([02 §6.1](02-mobile-architecture-and-development.md#61-auth-gated-navigator)) |
+| Random logouts                              | Backend returns 401 for non-auth errors, or token expiry too short → check codes; add refresh tokens                                                                             |
+| Logout loop / multiple logout animations    | Concurrent 401s each trigger logout → single-flight `performLogout`                                                                                                              |
+| Wrong password logs the user "out"          | Login endpoint excluded from the auth-expired interceptor                                                                                                                        |
+| Previous user's data visible after re-login | `queryClient.clear()` and store reset on logout                                                                                                                                  |
+| Token survives uninstall on iOS             | Keychain items persist across reinstalls → clear secure storage on the first launch after install                                                                                |
 
 ---
 
@@ -248,12 +249,12 @@ Plain `http://` is blocked by default: iOS ATS and Android cleartext policy (API
 
 ### 8.2 Map crashes
 
-| Crash | Fix |
-| --- | --- |
-| iOS crash on map mount with `PROVIDER_GOOGLE` | `GMSServices provideAPIKey` not called before render, or Google Maps pod not installed |
-| Android `API key not found` crash | `com.google.android.geo.API_KEY` meta-data missing or placeholder empty at build time |
-| Crash/jank with many custom markers | `tracksViewChanges={false}`; memoise markers; cluster |
-| Directions `REQUEST_DENIED` | Directions API not enabled, or key restricted to apps (web-service APIs can't use app restrictions) → proxy through the backend |
+| Crash                                         | Fix                                                                                                                             |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| iOS crash on map mount with `PROVIDER_GOOGLE` | `GMSServices provideAPIKey` not called before render, or Google Maps pod not installed                                          |
+| Android `API key not found` crash             | `com.google.android.geo.API_KEY` meta-data missing or placeholder empty at build time                                           |
+| Crash/jank with many custom markers           | `tracksViewChanges={false}`; memoise markers; cluster                                                                           |
+| Directions `REQUEST_DENIED`                   | Directions API not enabled, or key restricted to apps (web-service APIs can't use app restrictions) → proxy through the backend |
 
 ### 8.3 Location permission issues
 
@@ -267,51 +268,51 @@ Plain `http://` is blocked by default: iOS ATS and Android cleartext policy (API
 
 ## 9. Square payments
 
-| Problem | Cause | Fix / prevent |
-| --- | --- | --- |
-| App crashes on launch (iOS) after adding the SDK | SDK accessed before native initialisation | Initialise in `AppDelegate` before React Native starts ([03 §5.4](03-mobile-environment-and-integrations.md#54-sdk-initialisation-native-before-react-native-starts)) |
-| "Payments not configured" | `SQUARE_APPLICATION_ID` empty at **native** build time | Set it in the EAS env / `.env`, rebuild (not just Metro) |
-| Android build: "SQUARE_APPLICATION_ID has an invalid format" | Quotes or stray characters in the value | Value must match `[A-Za-z0-9_-]+` |
-| "Build doesn't match the connected Square environment" | Sandbox app ID with production backend, or the reverse | Align app env, backend `SQUARE_ENVIRONMENT` and IDs ([03 §5.8](03-mobile-environment-and-integrations.md#58-environment-separation)) |
-| `authorize()` never resolves | Native SDK has no timeout; network stall | Wrap with a timeout (20 s) and show a retryable error |
-| Previous company's merchant charged | Device still authorised to the old account | `deauthorize()` on logout, reconnect, company switch; check the location before reusing the session |
-| `LOCATION_NOT_ACTIVATED_FOR_CARD_PROCESSING` | Merchant location not activated (account verification incomplete) | Merchant completes activation in the Square Dashboard |
-| `UNSUPPORTED_COUNTRY` | Merchant country or currency not supported by the SDK | Check Square's supported countries; currency must match the merchant |
-| `DEVICE_TIME_DOES_NOT_MATCH_SERVER_TIME` | Device clock wrong | Ask the user to enable automatic date and time |
-| OAuth: "redirect_uri mismatch" | Callback URL in the Square dashboard differs from the backend's | Register the exact backend callback per environment |
-| OAuth returns but the app shows "disconnected" | Deep link not registered / handler not mounted; user closed the browser | Register the scheme; also refetch on `AppState → active` |
-| `409` from `/square/session` | Merchant revoked access or the token couldn't refresh | Show "Reconnect Square"; admin reconnects |
-| Payment succeeded in Square but not recorded | App killed before backend verification, or verification mismatch | Reconcile from webhooks or by `paymentId`; check the amount/currency/location logs |
-| Reader not found (Android) | Bluetooth/location permissions denied (API 31+ needs `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT`) | Request all reader permissions before `showSettings()` |
-| Build fails after an SDK upgrade | New minSdk / compileSdk / Kotlin / AGP / iOS target | Read the SDK release notes; upgrade the toolchain set ([04 §4.1](04-mobile-build-release-and-store-deployment.md#41-identity-and-sdk-levels)) |
+| Problem                                                      | Cause                                                                                        | Fix / prevent                                                                                                                                                         |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App crashes on launch (iOS) after adding the SDK             | SDK accessed before native initialisation                                                    | Initialise in `AppDelegate` before React Native starts ([03 §5.4](03-mobile-environment-and-integrations.md#54-sdk-initialisation-native-before-react-native-starts)) |
+| "Payments not configured"                                    | `SQUARE_APPLICATION_ID` empty at **native** build time                                       | Set it in the EAS env / `.env`, rebuild (not just Metro)                                                                                                              |
+| Android build: "SQUARE_APPLICATION_ID has an invalid format" | Quotes or stray characters in the value                                                      | Value must match `[A-Za-z0-9_-]+`                                                                                                                                     |
+| "Build doesn't match the connected Square environment"       | Sandbox app ID with production backend, or the reverse                                       | Align app env, backend `SQUARE_ENVIRONMENT` and IDs ([03 §5.8](03-mobile-environment-and-integrations.md#58-environment-separation))                                  |
+| `authorize()` never resolves                                 | Native SDK has no timeout; network stall                                                     | Wrap with a timeout (20 s) and show a retryable error                                                                                                                 |
+| Previous company's merchant charged                          | Device still authorised to the old account                                                   | `deauthorize()` on logout, reconnect, company switch; check the location before reusing the session                                                                   |
+| `LOCATION_NOT_ACTIVATED_FOR_CARD_PROCESSING`                 | Merchant location not activated (account verification incomplete)                            | Merchant completes activation in the Square Dashboard                                                                                                                 |
+| `UNSUPPORTED_COUNTRY`                                        | Merchant country or currency not supported by the SDK                                        | Check Square's supported countries; currency must match the merchant                                                                                                  |
+| `DEVICE_TIME_DOES_NOT_MATCH_SERVER_TIME`                     | Device clock wrong                                                                           | Ask the user to enable automatic date and time                                                                                                                        |
+| OAuth: "redirect_uri mismatch"                               | Callback URL in the Square dashboard differs from the backend's                              | Register the exact backend callback per environment                                                                                                                   |
+| OAuth returns but the app shows "disconnected"               | Deep link not registered / handler not mounted; user closed the browser                      | Register the scheme; also refetch on `AppState → active`                                                                                                              |
+| `409` from `/square/session`                                 | Merchant revoked access or the token couldn't refresh                                        | Show "Reconnect Square"; admin reconnects                                                                                                                             |
+| Payment succeeded in Square but not recorded                 | App killed before backend verification, or verification mismatch                             | Reconcile from webhooks or by `paymentId`; check the amount/currency/location logs                                                                                    |
+| Reader not found (Android)                                   | Bluetooth/location permissions denied (API 31+ needs `BLUETOOTH_SCAN` / `BLUETOOTH_CONNECT`) | Request all reader permissions before `showSettings()`                                                                                                                |
+| Build fails after an SDK upgrade                             | New minSdk / compileSdk / Kotlin / AGP / iOS target                                          | Read the SDK release notes; upgrade the toolchain set ([04 §4.1](04-mobile-build-release-and-store-deployment.md#41-identity-and-sdk-levels))                         |
 
 ---
 
 ## 10. Push notifications
 
-| Problem | Cause | Fix |
-| --- | --- | --- |
-| No token on simulator | Push tokens need a physical device (iOS Simulator push works only for local tests) | Test on a device |
-| No token on Android | Missing or mismatched `google-services.json` for the package; no Play Services (emulator without Google APIs) | Correct Firebase config; Google Play emulator image |
-| iOS: token received but no delivery | `aps-environment` mismatch (dev token sent to production APNs or the reverse); missing APNs key | Match entitlement and gateway; upload the `.p8` |
-| Android 13+: nothing shown | `POST_NOTIFICATIONS` not granted, or no channel | Request permission; create the channel |
-| Delivered but tap does nothing | No response listener / cold-start handling | `addNotificationResponseReceivedListener` + `getLastNotificationResponseAsync` ([03 §6.6](03-mobile-environment-and-integrations.md#66-foreground-background-tap-handling)) |
-| Users get other users' notifications | Token not removed on logout / not reassigned | Delete on logout; upsert by `deviceId` |
-| Works in dev, fails in production | Backend not storing tokens per environment, or production Firebase/APNs credentials missing | Check `appEnv` on device rows and production credentials |
+| Problem                              | Cause                                                                                                         | Fix                                                                                                                                                                         |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No token on simulator                | Push tokens need a physical device (iOS Simulator push works only for local tests)                            | Test on a device                                                                                                                                                            |
+| No token on Android                  | Missing or mismatched `google-services.json` for the package; no Play Services (emulator without Google APIs) | Correct Firebase config; Google Play emulator image                                                                                                                         |
+| iOS: token received but no delivery  | `aps-environment` mismatch (dev token sent to production APNs or the reverse); missing APNs key               | Match entitlement and gateway; upload the `.p8`                                                                                                                             |
+| Android 13+: nothing shown           | `POST_NOTIFICATIONS` not granted, or no channel                                                               | Request permission; create the channel                                                                                                                                      |
+| Delivered but tap does nothing       | No response listener / cold-start handling                                                                    | `addNotificationResponseReceivedListener` + `getLastNotificationResponseAsync` ([03 §6.6](03-mobile-environment-and-integrations.md#66-foreground-background-tap-handling)) |
+| Users get other users' notifications | Token not removed on logout / not reassigned                                                                  | Delete on logout; upsert by `deviceId`                                                                                                                                      |
+| Works in dev, fails in production    | Backend not storing tokens per environment, or production Firebase/APNs credentials missing                   | Check `appEnv` on device rows and production credentials                                                                                                                    |
 
 ---
 
 ## 11. Sockets and realtime
 
-| Problem | Cause | Fix |
-| --- | --- | --- |
-| Never connects on Android dev builds | Network inspector breaks the WebSocket upgrade with websocket-only transport | `transports: ['websocket', 'polling']`, `tryAllTransports: true` |
-| Connects, but no events after reconnect | Rooms not re-joined | Join rooms in the `connect` handler |
-| Events handled twice | Listener registered per mount without cleanup; duplicate REST + socket path | `off` in cleanup; subscriber list in a service; idempotent handlers |
-| Events missing after background | iOS suspended the socket | Refetch on foreground; push for critical events |
-| `connect_error: xhr poll error` / timeout | Wrong `BASE_URL`, TLS issue, proxy/load balancer not configured for WebSockets | Check the URL and host; enable WS upgrade and sticky sessions on the load balancer |
-| Works with one server, flaky with several | No Redis adapter / sticky sessions | Socket.IO Redis adapter + sticky sessions |
-| Users see other companies' events | Rooms joined from client-supplied IDs | Authenticate the handshake; the server assigns rooms ([03 §7.3](03-mobile-environment-and-integrations.md#73-authentication)) |
+| Problem                                   | Cause                                                                          | Fix                                                                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Never connects on Android dev builds      | Network inspector breaks the WebSocket upgrade with websocket-only transport   | `transports: ['websocket', 'polling']`, `tryAllTransports: true`                                                              |
+| Connects, but no events after reconnect   | Rooms not re-joined                                                            | Join rooms in the `connect` handler                                                                                           |
+| Events handled twice                      | Listener registered per mount without cleanup; duplicate REST + socket path    | `off` in cleanup; subscriber list in a service; idempotent handlers                                                           |
+| Events missing after background           | iOS suspended the socket                                                       | Refetch on foreground; push for critical events                                                                               |
+| `connect_error: xhr poll error` / timeout | Wrong `BASE_URL`, TLS issue, proxy/load balancer not configured for WebSockets | Check the URL and host; enable WS upgrade and sticky sessions on the load balancer                                            |
+| Works with one server, flaky with several | No Redis adapter / sticky sessions                                             | Socket.IO Redis adapter + sticky sessions                                                                                     |
+| Users see other companies' events         | Rooms joined from client-supplied IDs                                          | Authenticate the handshake; the server assigns rooms ([03 §7.3](03-mobile-environment-and-integrations.md#73-authentication)) |
 
 ---
 
@@ -330,22 +331,22 @@ Plain `http://` is blocked by default: iOS ATS and Android cleartext policy (API
 
 ### 12.2 iOS-only issues
 
-| Issue | Fix |
-| --- | --- |
-| Permission prompt never appears again | iOS asks once → `Linking.openSettings()` |
-| Keyboard covers inputs | `KeyboardAvoidingView behavior="padding"` |
-| Content under the notch / home indicator | `useSafeAreaInsets()` |
+| Issue                                      | Fix                                                                   |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| Permission prompt never appears again      | iOS asks once → `Linking.openSettings()`                              |
+| Keyboard covers inputs                     | `KeyboardAvoidingView behavior="padding"`                             |
+| Content under the notch / home indicator   | `useSafeAreaInsets()`                                                 |
 | App killed in background during long tasks | Background modes are limited; use push / background fetch, not timers |
 
 ### 12.3 Android-only issues
 
-| Issue | Fix |
-| --- | --- |
-| Hardware back exits the flow | `BackHandler` / navigation `beforeRemove` |
-| Notification or location service killed | Battery optimisation (OEM-specific); a foreground service with a visible notification |
-| `ForegroundServiceStartNotAllowedException` | Start foreground services only while in the foreground (Android 12+) |
-| Text cut off | Font scaling / `includeFontPadding: false`; test with large fonts |
-| Status / navigation bar colors wrong | `androidStatusBar` / `androidNavigationBar` config, `expo-navigation-bar` |
+| Issue                                       | Fix                                                                                   |
+| ------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Hardware back exits the flow                | `BackHandler` / navigation `beforeRemove`                                             |
+| Notification or location service killed     | Battery optimisation (OEM-specific); a foreground service with a visible notification |
+| `ForegroundServiceStartNotAllowedException` | Start foreground services only while in the foreground (Android 12+)                  |
+| Text cut off                                | Font scaling / `includeFontPadding: false`; test with large fonts                     |
+| Status / navigation bar colors wrong        | `androidStatusBar` / `androidNavigationBar` config, `expo-navigation-bar`             |
 
 ---
 

@@ -6,13 +6,13 @@ It's based on a real production app (Expo SDK 51, React Native 0.74, committed n
 
 ## Learning path
 
-| Step | Guide | Open it when you need to… |
-| --- | --- | --- |
-| **01** | [Mobile Project Setup](01-mobile-project-setup.md) | Set up a Mac (Node, pnpm, Xcode, CocoaPods, JDK, Android SDK), create or clone a project, run it on simulators and devices, and understand managed vs prebuild vs native folders |
-| **02** | [Architecture & Development](02-mobile-architecture-and-development.md) | Structure features: API layer, React Query, Redux, navigation, auth, errors, offline, storage, performance, UI, permissions, i18n, dates |
-| **03** | [Environments & Integrations](03-mobile-environment-and-integrations.md) | Separate Dev / Trial / Production, manage env vars and EAS environments, iOS schemes and app identity, and integrate Google Maps and location, Square payments, push notifications and sockets |
-| **04** | [Build, Release & Store Deployment](04-mobile-build-release-and-store-deployment.md) | Build APK/AAB/IPA locally or with EAS, handle signing and credentials, ship through Play Console, TestFlight and App Store, and run the release checklist |
-| **05** | [Troubleshooting & Best Practices](05-mobile-troubleshooting-and-best-practices.md) | Fix Metro, Gradle, CocoaPods, Xcode, EAS, env, network, maps, payment, push and socket problems; apply production best practices and the final production checklist |
+| Step   | Guide                                                                                | Open it when you need to…                                                                                                                                                                      |
+| ------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **01** | [Mobile Project Setup](01-mobile-project-setup.md)                                   | Set up a Mac (Node, pnpm, Xcode, CocoaPods, JDK, Android SDK), create or clone a project, run it on simulators and devices, and understand managed vs prebuild vs native folders               |
+| **02** | [Architecture & Development](02-mobile-architecture-and-development.md)              | Structure features: API layer, React Query, Redux, navigation, auth, errors, offline, storage, performance, UI, permissions, i18n, dates                                                       |
+| **03** | [Environments & Integrations](03-mobile-environment-and-integrations.md)             | Separate Dev / Trial / Production, manage env vars and EAS environments, iOS schemes and app identity, and integrate Google Maps and location, Square payments, push notifications and sockets |
+| **04** | [Build, Release & Store Deployment](04-mobile-build-release-and-store-deployment.md) | Build APK/AAB/IPA locally or with EAS, handle signing and credentials, ship through Play Console, TestFlight and App Store, and run the release checklist                                      |
+| **05** | [Troubleshooting & Best Practices](05-mobile-troubleshooting-and-best-practices.md)  | Fix Metro, Gradle, CocoaPods, Xcode, EAS, env, network, maps, payment, push and socket problems; apply production best practices and the final production checklist                            |
 
 ## Where to start
 

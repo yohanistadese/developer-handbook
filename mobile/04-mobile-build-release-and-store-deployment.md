@@ -13,13 +13,13 @@ local dev build ──► preview/trial build (internal) ──► production bu
    (dev env)              (trial env)                     (prod env)
 ```
 
-| Build type | JS bundle | Debuggable | Env | Who installs |
-| --- | --- | --- | --- | --- |
-| Development build (dev client) | Loaded from Metro | Yes | development | Developers |
-| Debug build (`expo run:*`) | Metro | Yes | whatever `.env`/`ENVFILE` says | Developers |
-| Release build, local | Embedded, minified | No | whatever `.env` says ⚠️ | Developer smoke tests |
-| Preview (EAS) | Embedded | No | `preview` EAS env | QA / internal testers |
-| Production (EAS) | Embedded | No | `production` EAS env | Store |
+| Build type                     | JS bundle          | Debuggable | Env                            | Who installs          |
+| ------------------------------ | ------------------ | ---------- | ------------------------------ | --------------------- |
+| Development build (dev client) | Loaded from Metro  | Yes        | development                    | Developers            |
+| Debug build (`expo run:*`)     | Metro              | Yes        | whatever `.env`/`ENVFILE` says | Developers            |
+| Release build, local           | Embedded, minified | No         | whatever `.env` says ⚠️        | Developer smoke tests |
+| Preview (EAS)                  | Embedded           | No         | `preview` EAS env              | QA / internal testers |
+| Production (EAS)               | Embedded           | No         | `production` EAS env           | Store                 |
 
 > ⚠️ **Local release builds use whatever env file is active.** That's the most common way a development API ends up in a "production" build. Use **EAS production builds** for anything that goes to a store.
 
@@ -55,12 +55,12 @@ cd ..
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 ```
 
-| | APK | AAB |
-| --- | --- | --- |
-| Install directly | Yes | No (needs bundletool or Play) |
-| Play Store upload | No (for new apps) | **Required** |
-| Size per device | Larger (all ABIs/resources) | Play generates optimised APKs per device |
-| EAS profile (project example) | `preview` (`buildType: apk`) | `production` (`buildType: app-bundle`) |
+|                               | APK                          | AAB                                      |
+| ----------------------------- | ---------------------------- | ---------------------------------------- |
+| Install directly              | Yes                          | No (needs bundletool or Play)            |
+| Play Store upload             | No (for new apps)            | **Required**                             |
+| Size per device               | Larger (all ABIs/resources)  | Play generates optimised APKs per device |
+| EAS profile (project example) | `preview` (`buildType: apk`) | `production` (`buildType: app-bundle`)   |
 
 > **Project example:** `release` keeps only `arm64-v8a` (`ndk { abiFilters "arm64-v8a" }`). Release APKs won't install on x86 emulators. Use an arm64 emulator image or a physical device.
 
@@ -69,7 +69,7 @@ adb install -r android/app/build/outputs/apk/release/app-release.apk
 1. Select the **production scheme** (`ProjectNameProduction`) and **Any iOS Device (arm64)**.
 2. **Product → Clean Build Folder** (⇧⌘K).
 3. **Product → Archive**. Then confirm the env: `cmp .env .env.production && echo "PROD env used"` ([03 §3.1](03-mobile-environment-and-integrations.md#31-ios-schemes-project-example)).
-4. **Organizer → Distribute App → App Store Connect → Upload** (or *TestFlight Internal Only*).
+4. **Organizer → Distribute App → App Store Connect → Upload** (or _TestFlight Internal Only_).
 
 CLI equivalent:
 
@@ -108,21 +108,33 @@ eas diagnostics                # environment info for bug reports
 {
   "cli": { "version": ">= 20.0.0", "appVersionSource": "remote" },
   "build": {
-    "development": { "developmentClient": true, "distribution": "internal", "environment": "development" },
-    "preview":     { "distribution": "internal", "environment": "preview", "android": { "buildType": "apk" } },
-    "production":  { "autoIncrement": true, "environment": "production", "android": { "buildType": "app-bundle" } }
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "environment": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "environment": "preview",
+      "android": { "buildType": "apk" }
+    },
+    "production": {
+      "autoIncrement": true,
+      "environment": "production",
+      "android": { "buildType": "app-bundle" }
+    }
   },
   "submit": { "production": {} }
 }
 ```
 
-| Key | Effect |
-| --- | --- |
-| `environment` | Which EAS environment's variables the build gets ([03 §1.6](03-mobile-environment-and-integrations.md#16-eas-environment-variables)) |
-| `developmentClient` | Includes `expo-dev-client` (dev menu, Metro loading) |
-| `distribution: internal` | Ad-hoc / direct install links, not for stores |
-| `appVersionSource: remote` | EAS stores the **build number / versionCode**. Native values in `Info.plist` / `build.gradle` are overwritten on EAS builds |
-| `autoIncrement` | EAS bumps the build number / versionCode on each production build |
+| Key                        | Effect                                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `environment`              | Which EAS environment's variables the build gets ([03 §1.6](03-mobile-environment-and-integrations.md#16-eas-environment-variables)) |
+| `developmentClient`        | Includes `expo-dev-client` (dev menu, Metro loading)                                                                                 |
+| `distribution: internal`   | Ad-hoc / direct install links, not for stores                                                                                        |
+| `appVersionSource: remote` | EAS stores the **build number / versionCode**. Native values in `Info.plist` / `build.gradle` are overwritten on EAS builds          |
+| `autoIncrement`            | EAS bumps the build number / versionCode on each production build                                                                    |
 
 Useful additions:
 
@@ -134,14 +146,14 @@ Useful additions:
 
 Let EAS manage credentials unless you have a reason not to:
 
-| Platform | What | Managed by |
-| --- | --- | --- |
-| Android | Upload keystore (`.jks`) + alias + passwords | `eas credentials` (generated on the first build; **download a backup**) |
-| Android | App signing key | Google Play App Signing (recommended) |
-| iOS | Distribution certificate (`.p12`) | EAS (needs Apple Developer access) |
-| iOS | Provisioning profiles (ad-hoc, App Store) | EAS, regenerated when devices or capabilities change |
-| iOS | APNs key (`.p8`) | EAS / Firebase, for push |
-| iOS | App Store Connect API key | EAS submit, for non-interactive uploads |
+| Platform | What                                         | Managed by                                                              |
+| -------- | -------------------------------------------- | ----------------------------------------------------------------------- |
+| Android  | Upload keystore (`.jks`) + alias + passwords | `eas credentials` (generated on the first build; **download a backup**) |
+| Android  | App signing key                              | Google Play App Signing (recommended)                                   |
+| iOS      | Distribution certificate (`.p12`)            | EAS (needs Apple Developer access)                                      |
+| iOS      | Provisioning profiles (ad-hoc, App Store)    | EAS, regenerated when devices or capabilities change                    |
+| iOS      | APNs key (`.p8`)                             | EAS / Firebase, for push                                                |
+| iOS      | App Store Connect API key                    | EAS submit, for non-interactive uploads                                 |
 
 If you lose the Android upload key you can request a reset through Play App Signing. Without Play App Signing, a lost key means you can never update the app. Back up keystores to the team's secret manager.
 
@@ -153,20 +165,20 @@ If you lose the Android upload key you can request a reset through Play App Sign
 
 **Project example** (`android/build.gradle`, `android/app/build.gradle`):
 
-| Setting | Value | Notes |
-| --- | --- | --- |
-| `applicationId` / `namespace` | `YOUR_PACKAGE_NAME` | Permanent after the first Play release |
-| `minSdkVersion` | `28` | Raised from the RN default for the Square SDK |
-| `compileSdkVersion` | `36` | Required by the Square SDK |
-| `targetSdkVersion` | `34` | **Check Play's current target-API requirement before each release.** Play raises it every year, and it may already require a higher value than this |
-| `buildToolsVersion` | `36.0.0` | |
-| NDK | `26.1.10909125` | |
-| AGP | `8.9.1` | "Must be ≥ 8.9.1" for the Square SDK |
-| Gradle wrapper | `8.13` | `android/gradle/wrapper/gradle-wrapper.properties` |
-| Kotlin | `2.2.21` | |
-| JDK | 17 | |
-| Hermes | enabled | `hermesEnabled=true` |
-| New architecture | disabled | `newArchEnabled=false` |
+| Setting                       | Value               | Notes                                                                                                                                               |
+| ----------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `applicationId` / `namespace` | `YOUR_PACKAGE_NAME` | Permanent after the first Play release                                                                                                              |
+| `minSdkVersion`               | `28`                | Raised from the RN default for the Square SDK                                                                                                       |
+| `compileSdkVersion`           | `36`                | Required by the Square SDK                                                                                                                          |
+| `targetSdkVersion`            | `34`                | **Check Play's current target-API requirement before each release.** Play raises it every year, and it may already require a higher value than this |
+| `buildToolsVersion`           | `36.0.0`            |                                                                                                                                                     |
+| NDK                           | `26.1.10909125`     |                                                                                                                                                     |
+| AGP                           | `8.9.1`             | "Must be ≥ 8.9.1" for the Square SDK                                                                                                                |
+| Gradle wrapper                | `8.13`              | `android/gradle/wrapper/gradle-wrapper.properties`                                                                                                  |
+| Kotlin                        | `2.2.21`            |                                                                                                                                                     |
+| JDK                           | 17                  |                                                                                                                                                     |
+| Hermes                        | enabled             | `hermesEnabled=true`                                                                                                                                |
+| New architecture              | disabled            | `newArchEnabled=false`                                                                                                                              |
 
 Override these through `gradle.properties` (`android.minSdkVersion=…`) or `expo-build-properties` in CNG projects. Avoid editing them in several places.
 
@@ -217,14 +229,14 @@ Add every signing certificate's **SHA-1** (debug, upload, Play app signing) to G
 
 ### 5.1 Identity and settings
 
-| Setting | Where | Project example |
-| --- | --- | --- |
-| Bundle ID | `PRODUCT_BUNDLE_IDENTIFIER` (Xcode) / `ios.bundleIdentifier` | `YOUR_BUNDLE_ID` |
-| Team | `DEVELOPMENT_TEAM` / `ios.appleTeamId` | — |
-| Deployment target | Xcode target + `Podfile` (`ios.deploymentTarget` in `Podfile.properties.json`) | Podfile `16.0`; the Square pod requires `16` |
-| Version | `MARKETING_VERSION` / `CFBundleShortVersionString` | user-facing `1.4.0` |
-| Build number | `CURRENT_PROJECT_VERSION` / `CFBundleVersion` | must increase per upload for the same version |
-| Signing | Automatic (`CODE_SIGN_STYLE = Automatic`) | — |
+| Setting           | Where                                                                          | Project example                               |
+| ----------------- | ------------------------------------------------------------------------------ | --------------------------------------------- |
+| Bundle ID         | `PRODUCT_BUNDLE_IDENTIFIER` (Xcode) / `ios.bundleIdentifier`                   | `YOUR_BUNDLE_ID`                              |
+| Team              | `DEVELOPMENT_TEAM` / `ios.appleTeamId`                                         | —                                             |
+| Deployment target | Xcode target + `Podfile` (`ios.deploymentTarget` in `Podfile.properties.json`) | Podfile `16.0`; the Square pod requires `16`  |
+| Version           | `MARKETING_VERSION` / `CFBundleShortVersionString`                             | user-facing `1.4.0`                           |
+| Build number      | `CURRENT_PROJECT_VERSION` / `CFBundleVersion`                                  | must increase per upload for the same version |
+| Signing           | Automatic (`CODE_SIGN_STYLE = Automatic`)                                      | —                                             |
 
 > ⚠️ **Keep identity in one place.** The project example had a bundle ID in `app.config.js` that differed from the Xcode project, a deployment target of `18.6` on the app target vs `16.0` in the Podfile, and different version strings in `app.config.js`, `Info.plist` and `MARKETING_VERSION`. In a prebuilt project, **the Xcode project is what ships**. Either keep `app.config.js` in sync or treat the native values as the source of truth and document that. A deployment target set higher than needed silently drops support for older iPhones.
 
@@ -319,15 +331,15 @@ Copy this into the release PR or ticket.
 
 ## 8. Avoiding a dev build or dev config in production
 
-| Risk | Guardrail |
-| --- | --- |
-| Local release build with dev `.env` | Only EAS `production` builds go to stores; local release builds are for smoke tests |
+| Risk                                   | Guardrail                                                                                                                                                           |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local release build with dev `.env`    | Only EAS `production` builds go to stores; local release builds are for smoke tests                                                                                 |
 | Xcode scheme pre-action fails silently | "Provide build settings from" set; `cmp .env .env.production` after archiving ([03 §3.1](03-mobile-environment-and-integrations.md#31-ios-schemes-project-example)) |
-| `preview` profile missing variables | `eas env:list --environment preview` in the checklist |
-| Sandbox payment ID in production | Release-time assertion + backend application-ID match check ([03 §5.8](03-mobile-environment-and-integrations.md#58-environment-separation)) |
-| Dev client uploaded | `developmentClient: true` only in the `development` profile; App Store builds can't include the dev menu |
-| Same bundle ID for all envs | Separate IDs and names per environment ([03 §3.2](03-mobile-environment-and-integrations.md#32-recommended-separate-identity-per-environment)) |
-| Anyone can edit production env | Restrict EAS production environment and store-console access |
+| `preview` profile missing variables    | `eas env:list --environment preview` in the checklist                                                                                                               |
+| Sandbox payment ID in production       | Release-time assertion + backend application-ID match check ([03 §5.8](03-mobile-environment-and-integrations.md#58-environment-separation))                        |
+| Dev client uploaded                    | `developmentClient: true` only in the `development` profile; App Store builds can't include the dev menu                                                            |
+| Same bundle ID for all envs            | Separate IDs and names per environment ([03 §3.2](03-mobile-environment-and-integrations.md#32-recommended-separate-identity-per-environment))                      |
+| Anyone can edit production env         | Restrict EAS production environment and store-console access                                                                                                        |
 
 ---
 

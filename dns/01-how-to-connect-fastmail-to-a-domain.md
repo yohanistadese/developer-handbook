@@ -8,9 +8,9 @@ This guide only changes **email-related** DNS records. Do not touch your website
 
 ## 1. What You Need
 
-* A domain you own.
-* Access to the domain's DNS settings.
-* A Fastmail account that supports custom domains.
+- A domain you own.
+- Access to the domain's DNS settings.
+- A Fastmail account that supports custom domains.
 
 You do not need to transfer or move your domain. It can stay with your current registrar.
 
@@ -58,8 +58,8 @@ Do not guess these values — always copy them from your Fastmail domain setup p
 
 1. Copy the SPF value shown in Fastmail.
 2. Check if a TXT record starting with `v=spf1` already exists.
-   * If yes, merge Fastmail's part into it — do not add a second one.
-   * If no, add it as a new TXT record.
+   - If yes, merge Fastmail's part into it — do not add a second one.
+   - If no, add it as a new TXT record.
 
 A domain should only ever have **one** SPF record.
 
@@ -109,18 +109,18 @@ Start with `p=none` if unsure, then tighten later.
 
 ## 10. Important DNS Rules
 
-* Copy values directly from Fastmail — don't guess or reuse values from another domain.
-* Remove conflicting old MX records before adding new ones.
-* Keep only one SPF record per domain.
-* Don't change unrelated website DNS records.
-* DNS propagation can take from a few minutes up to 24–48 hours.
+- Copy values directly from Fastmail — don't guess or reuse values from another domain.
+- Remove conflicting old MX records before adding new ones.
+- Keep only one SPF record per domain.
+- Don't change unrelated website DNS records.
+- DNS propagation can take from a few minutes up to 24–48 hours.
 
 ---
 
 ## 11. Common DNS Provider Locations
 
 | Provider   | Where to find DNS settings                      |
-| ---------- | ------------------------------------------------ |
+| ---------- | ----------------------------------------------- |
 | GoDaddy    | My Products → Domain → DNS → Manage DNS Records |
 | Namecheap  | Domain List → Manage → Advanced DNS             |
 | Cloudflare | Select domain → DNS → Records                   |

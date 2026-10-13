@@ -46,22 +46,22 @@ ai-calling/
 
 ## 2. Tools & services
 
-| Tool | Purpose | Link |
-| --- | --- | --- |
-| Docker | Local PostgreSQL | https://www.docker.com/ |
-| PostgreSQL | Primary database | https://www.postgresql.org/ |
-| FastAPI | Backend API framework | https://fastapi.tiangolo.com/ |
-| SQLAlchemy | ORM | https://www.sqlalchemy.org/ |
-| Alembic | Database migrations | https://alembic.sqlalchemy.org/ |
-| React (Vite) | Dashboard frontend | https://react.dev/ · https://vitejs.dev/ |
-| Telnyx | Outbound calling, Call Control API | https://telnyx.com/ |
-| Pipecat | Real-time voice pipeline orchestration | https://docs.pipecat.ai/ |
-| Deepgram | Streaming speech-to-text | https://deepgram.com/ |
-| OpenAI | LLM + (optionally) TTS | https://openai.com/ |
-| ElevenLabs | Alternative TTS provider | https://elevenlabs.io/ |
-| Cartesia | Alternative TTS provider | https://cartesia.ai/ |
-| Google Calendar API | Appointment booking | https://developers.google.com/calendar/api |
-| Redis + Celery/arq | Optional concurrency control for the campaign dialer | https://redis.io/ · https://docs.celeryq.org/ |
+| Tool                | Purpose                                              | Link                                          |
+| ------------------- | ---------------------------------------------------- | --------------------------------------------- |
+| Docker              | Local PostgreSQL                                     | https://www.docker.com/                       |
+| PostgreSQL          | Primary database                                     | https://www.postgresql.org/                   |
+| FastAPI             | Backend API framework                                | https://fastapi.tiangolo.com/                 |
+| SQLAlchemy          | ORM                                                  | https://www.sqlalchemy.org/                   |
+| Alembic             | Database migrations                                  | https://alembic.sqlalchemy.org/               |
+| React (Vite)        | Dashboard frontend                                   | https://react.dev/ · https://vitejs.dev/      |
+| Telnyx              | Outbound calling, Call Control API                   | https://telnyx.com/                           |
+| Pipecat             | Real-time voice pipeline orchestration               | https://docs.pipecat.ai/                      |
+| Deepgram            | Streaming speech-to-text                             | https://deepgram.com/                         |
+| OpenAI              | LLM + (optionally) TTS                               | https://openai.com/                           |
+| ElevenLabs          | Alternative TTS provider                             | https://elevenlabs.io/                        |
+| Cartesia            | Alternative TTS provider                             | https://cartesia.ai/                          |
+| Google Calendar API | Appointment booking                                  | https://developers.google.com/calendar/api    |
+| Redis + Celery/arq  | Optional concurrency control for the campaign dialer | https://redis.io/ · https://docs.celeryq.org/ |
 
 > **Security note:** all credentials (Telnyx, Deepgram, OpenAI, TTS, Google
 > OAuth) live only in `.env` / secure server-side storage, are never
@@ -133,6 +133,7 @@ ai-calling/
 ## Step 4 — Connect Telnyx (first real call, no AI)
 
 **Setup** ([telnyx.com](https://telnyx.com/)):
+
 1. Create a Telnyx account, buy a phone number, enable Voice API on it.
 2. Create a Telnyx Call Control application.
 3. Point its webhook at your backend, e.g.
@@ -140,6 +141,7 @@ ai-calling/
 4. Store the API key as `TELNYX_API_KEY`.
 
 **Implementation:**
+
 1. `POST /calls` places an outbound call via the Telnyx API.
 2. Create a `calls` row with `started_at = now` and the `telnyx_call_id`.
 3. `POST /webhooks/telnyx/status` receives status events (answered,
@@ -155,10 +157,12 @@ accurately — no AI involved yet.
 ## Step 5 — Pipecat + Deepgram (speech-to-text)
 
 **Setup** ([deepgram.com](https://deepgram.com/), [Pipecat docs](https://docs.pipecat.ai/)):
+
 1. Get a Deepgram API key → `DEEPGRAM_API_KEY`.
 2. `pip install pipecat-ai`.
 
 **Implementation:**
+
 1. Pipeline: Telnyx audio → Deepgram (streaming STT) → text.
 2. Wire the pipeline into the live Telnyx call.
 3. Log transcribed text to confirm accuracy.
@@ -171,9 +175,11 @@ backend.
 ## Step 6 — Connect the LLM (AI brain)
 
 **Setup** ([openai.com](https://openai.com/)):
+
 1. Get an OpenAI API key → `OPENAI_API_KEY`.
 
 **Implementation:**
+
 1. Extend the pipeline: Deepgram text → OpenAI LLM → response text.
 2. Write a focused sales system prompt: introduce itself → identify
    decision maker → understand needs → ask qualification questions →
@@ -190,11 +196,13 @@ backend.
 **Setup** — pick one: [OpenAI TTS](https://openai.com/), [ElevenLabs](https://elevenlabs.io/), Deepgram Aura ([deepgram.com](https://deepgram.com/)), or [Cartesia](https://cartesia.ai/).
 
 **Implementation:**
+
 1. Extend the pipeline: LLM response text → TTS → audio → back through
    Telnyx to the customer.
 2. Handle interruptions (barge-in), silence/timeouts, background noise.
 
 **Test explicitly:**
+
 - [ ] Normal conversation
 - [ ] Customer interrupts the AI
 - [ ] Silence
@@ -208,6 +216,7 @@ backend.
 ## Step 8 — Connect calendar + AI tool calls
 
 **Setup** ([Google Calendar API](https://developers.google.com/calendar/api)):
+
 1. Create a Google Cloud project, enable the Calendar API.
 2. Set up OAuth2 credentials for the sales calendar account.
 3. Run a one-time auth flow to get a refresh token; store it server-side.
@@ -215,6 +224,7 @@ backend.
    storage.
 
 **Implementation:**
+
 1. Give the LLM these callable tools (Pipecat/OpenAI function calling):
    `check_calendar()`, `book_appointment(lead_id, call_id, scheduled_at)`,
    `save_qualification(call_id, ...)`, `save_call_result(call_id, outcome)`,
@@ -233,6 +243,7 @@ real calendar, live, during the call.
 ## Step 9 — Campaign engine + React dashboard
 
 **Implementation:**
+
 1. Campaign dialer loop: get next lead → check Do Not Call → call → AI
    conversation → save result → next lead.
 2. Start at concurrency = 1, confirm stability, then raise it.
@@ -288,9 +299,9 @@ level is stable.
 
 ## Key takeaway
 
-* Each pipeline stage (Telnyx → Deepgram → OpenAI → TTS) is added and
+- Each pipeline stage (Telnyx → Deepgram → OpenAI → TTS) is added and
   verified one at a time — never wire the whole voice loop together before
   each piece works in isolation.
-* The AI qualifies and books; it does not close the sale in V1.
-* All API keys and tokens live in `.env` / secure server-side storage only —
+- The AI qualifies and books; it does not close the sale in V1.
+- All API keys and tokens live in `.env` / secure server-side storage only —
   never in code, logs, or version control.

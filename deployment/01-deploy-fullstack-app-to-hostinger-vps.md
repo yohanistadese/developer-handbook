@@ -163,11 +163,11 @@ This creates `client/dist/`.
 
 At your DNS provider, add:
 
-| Type | Name | Value        |
-| ---- | ---- | ------------ |
-| A    | @    | YOUR_VPS_IP  |
-| A    | www  | YOUR_VPS_IP  |
-| A    | api  | YOUR_VPS_IP  |
+| Type | Name | Value       |
+| ---- | ---- | ----------- |
+| A    | @    | YOUR_VPS_IP |
+| A    | www  | YOUR_VPS_IP |
+| A    | api  | YOUR_VPS_IP |
 
 ---
 
@@ -316,6 +316,6 @@ bash restart.sh
 
 ## Key takeaway
 
-* **PM2** runs the Node/Express API.
-* **Nginx** serves the built React/Vite files and proxies API requests to PM2.
-* Never expose the API's port (e.g. `5000`) directly to the internet — always go through Nginx.
+- **PM2** runs the Node/Express API.
+- **Nginx** serves the built React/Vite files and proxies API requests to PM2.
+- Never expose the API's port (e.g. `5000`) directly to the internet — always go through Nginx.

@@ -12,13 +12,13 @@ Part of the [Mobile Development Handbook](README.md). Next: [02 — Architecture
 
 A reusable reference for building, configuring, releasing and maintaining React Native / Expo apps. Each guide covers one stage of the lifecycle:
 
-| Guide | Use it when |
-| --- | --- |
-| 01 Setup (this file) | Setting up a machine or starting a project |
-| [02 Architecture](02-mobile-architecture-and-development.md) | Writing features |
+| Guide                                                                       | Use it when                                               |
+| --------------------------------------------------------------------------- | --------------------------------------------------------- |
+| 01 Setup (this file)                                                        | Setting up a machine or starting a project                |
+| [02 Architecture](02-mobile-architecture-and-development.md)                | Writing features                                          |
 | [03 Environments & Integrations](03-mobile-environment-and-integrations.md) | Configuring dev/trial/prod, maps, payments, push, sockets |
-| [04 Build & Release](04-mobile-build-release-and-store-deployment.md) | Building and shipping to the stores |
-| [05 Troubleshooting](05-mobile-troubleshooting-and-best-practices.md) | Something is broken, or before a release |
+| [04 Build & Release](04-mobile-build-release-and-store-deployment.md)       | Building and shipping to the stores                       |
+| [05 Troubleshooting](05-mobile-troubleshooting-and-best-practices.md)       | Something is broken, or before a release                  |
 
 ---
 
@@ -26,24 +26,24 @@ A reusable reference for building, configuring, releasing and maintaining React 
 
 **Project example** (verified from `package.json`, `android/`, `ios/`):
 
-| Layer | Choice | Version |
-| --- | --- | --- |
-| Framework | Expo SDK + React Native | Expo `51`, RN `0.74.5`, React `18.2.0` |
-| Language | TypeScript (`strict: true`) | `5.3` |
-| JS engine / architecture | Hermes, **old architecture** (`newArchEnabled: false`) | — |
-| Package manager | pnpm (pinned via `packageManager`) | `10.x` |
-| Navigation | React Navigation (stack + bottom tabs) | `7.x` |
-| Server state | TanStack React Query | `5.x` |
-| Client state | Redux Toolkit + redux-persist | `2.x` / `6.x` |
-| HTTP | Axios | `1.x` |
-| Realtime | socket.io-client | `4.8` |
-| Env config | `react-native-config` + `app.config.js` `extra` + EAS environments | — |
-| Maps | `react-native-maps` (+ `react-native-maps-directions`) | `1.14.0` |
-| Payments | Square Mobile Payments SDK (`mobile-payments-sdk-react-native`) | native SDK `2.6.x` |
-| Push | `expo-notifications` (native FCM/APNs tokens) | `0.28` |
-| Location | `expo-location` + `expo-task-manager` (background) | `17.x` |
-| i18n | i18next + react-i18next | — |
-| Build/CI | EAS Build, GitHub Actions, husky + lint-staged, gitleaks | — |
+| Layer                    | Choice                                                             | Version                                |
+| ------------------------ | ------------------------------------------------------------------ | -------------------------------------- |
+| Framework                | Expo SDK + React Native                                            | Expo `51`, RN `0.74.5`, React `18.2.0` |
+| Language                 | TypeScript (`strict: true`)                                        | `5.3`                                  |
+| JS engine / architecture | Hermes, **old architecture** (`newArchEnabled: false`)             | —                                      |
+| Package manager          | pnpm (pinned via `packageManager`)                                 | `10.x`                                 |
+| Navigation               | React Navigation (stack + bottom tabs)                             | `7.x`                                  |
+| Server state             | TanStack React Query                                               | `5.x`                                  |
+| Client state             | Redux Toolkit + redux-persist                                      | `2.x` / `6.x`                          |
+| HTTP                     | Axios                                                              | `1.x`                                  |
+| Realtime                 | socket.io-client                                                   | `4.8`                                  |
+| Env config               | `react-native-config` + `app.config.js` `extra` + EAS environments | —                                      |
+| Maps                     | `react-native-maps` (+ `react-native-maps-directions`)             | `1.14.0`                               |
+| Payments                 | Square Mobile Payments SDK (`mobile-payments-sdk-react-native`)    | native SDK `2.6.x`                     |
+| Push                     | `expo-notifications` (native FCM/APNs tokens)                      | `0.28`                                 |
+| Location                 | `expo-location` + `expo-task-manager` (background)                 | `17.x`                                 |
+| i18n                     | i18next + react-i18next                                            | —                                      |
+| Build/CI                 | EAS Build, GitHub Actions, husky + lint-staged, gitleaks           | —                                      |
 
 **General recommendation:** pick the newest Expo SDK that every native dependency you need supports, and upgrade one SDK at a time. Payment, maps and camera SDKs are usually what holds an upgrade back.
 
@@ -53,19 +53,19 @@ A reusable reference for building, configuring, releasing and maintaining React 
 
 ### 3.1 Version reference
 
-| Tool | Project example | Notes |
-| --- | --- | --- |
-| macOS | Required for iOS | Android works on any OS |
-| Node.js | `22` (CI uses Node 22) | Use an LTS. Pin it with `.nvmrc` (the project example doesn't, see §11) |
-| pnpm | `10.x` | Enable with Corepack, below |
-| Xcode | Version that supports your iOS deployment target | Full App Store install, not just CLT |
-| CocoaPods | Current stable | `brew install cocoapods` |
-| JDK | **17** (React Native Gradle plugin uses a JDK 17 toolchain) | Temurin 17 |
-| Android Studio | Current stable | SDK, emulator, platform-tools |
-| Android SDK | compileSdk `36`, targetSdk `34`, minSdk `28`, build-tools `36.0.0`, NDK `26.1.10909125` | Read from `android/build.gradle` |
-| Gradle / AGP / Kotlin | Gradle `8.13`, AGP `8.9.1`, Kotlin `2.2.21` | Set by the project, never install separately |
-| EAS CLI | `>= 20.0.0` (from `eas.json`) | Global install |
-| Git | Any recent | SSH access to GitHub |
+| Tool                  | Project example                                                                         | Notes                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| macOS                 | Required for iOS                                                                        | Android works on any OS                                                 |
+| Node.js               | `22` (CI uses Node 22)                                                                  | Use an LTS. Pin it with `.nvmrc` (the project example doesn't, see §11) |
+| pnpm                  | `10.x`                                                                                  | Enable with Corepack, below                                             |
+| Xcode                 | Version that supports your iOS deployment target                                        | Full App Store install, not just CLT                                    |
+| CocoaPods             | Current stable                                                                          | `brew install cocoapods`                                                |
+| JDK                   | **17** (React Native Gradle plugin uses a JDK 17 toolchain)                             | Temurin 17                                                              |
+| Android Studio        | Current stable                                                                          | SDK, emulator, platform-tools                                           |
+| Android SDK           | compileSdk `36`, targetSdk `34`, minSdk `28`, build-tools `36.0.0`, NDK `26.1.10909125` | Read from `android/build.gradle`                                        |
+| Gradle / AGP / Kotlin | Gradle `8.13`, AGP `8.9.1`, Kotlin `2.2.21`                                             | Set by the project, never install separately                            |
+| EAS CLI               | `>= 20.0.0` (from `eas.json`)                                                           | Global install                                                          |
+| Git                   | Any recent                                                                              | SSH access to GitHub                                                    |
 
 > ⚠️ Don't upgrade Node, Xcode, Gradle, Kotlin or the SDK to "latest" just because it's available. Use the versions the project specifies. Upgrading the toolchain without the project is the most common cause of build failures ([05 §3](05-mobile-troubleshooting-and-best-practices.md#3-android-and-gradle)).
 
@@ -157,11 +157,11 @@ xcodebuild -version; pod --version; adb version; eas --version
 
 Read this before changing any native setting.
 
-| Workflow | `ios/` and `android/` in Git? | Where native config lives | Typical commands |
-| --- | --- | --- | --- |
-| **Managed** (Expo Go) | No | `app.json` / `app.config.js` only | `expo start` (Expo Go) |
-| **Managed + CNG** (Continuous Native Generation) | No, generated on demand | `app.config.js` + config plugins | `expo prebuild`, `expo run:*`, `eas build` |
-| **Prebuilt / bare** (committed native folders) | **Yes** | Native files, plus `app.config.js` for JS-side values | `expo run:*`, Xcode, Gradle, `eas build` |
+| Workflow                                         | `ios/` and `android/` in Git? | Where native config lives                             | Typical commands                           |
+| ------------------------------------------------ | ----------------------------- | ----------------------------------------------------- | ------------------------------------------ |
+| **Managed** (Expo Go)                            | No                            | `app.json` / `app.config.js` only                     | `expo start` (Expo Go)                     |
+| **Managed + CNG** (Continuous Native Generation) | No, generated on demand       | `app.config.js` + config plugins                      | `expo prebuild`, `expo run:*`, `eas build` |
+| **Prebuilt / bare** (committed native folders)   | **Yes**                       | Native files, plus `app.config.js` for JS-side values | `expo run:*`, Xcode, Gradle, `eas build`   |
 
 **Project example:** the native folders are committed and hand-edited. For example:
 
@@ -285,12 +285,12 @@ The emulator reaches the Mac at `http://10.0.2.2:PORT`. Alternatively, run `adb 
 
 ### Physical devices
 
-| | iOS | Android |
-| --- | --- | --- |
-| Enable | Settings → Privacy & Security → **Developer Mode** (restart) | Settings → About → tap **Build number** 7×, then **USB debugging** |
-| Trust | "Trust this computer" | Accept the RSA fingerprint prompt (`adb devices` must say `device`, not `unauthorized`) |
-| Signing | Xcode → target → Signing & Capabilities → Team | Debug keystore, automatic |
-| Run | `pnpm ios -- --device` | `pnpm android` with the device connected |
+|         | iOS                                                          | Android                                                                                 |
+| ------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Enable  | Settings → Privacy & Security → **Developer Mode** (restart) | Settings → About → tap **Build number** 7×, then **USB debugging**                      |
+| Trust   | "Trust this computer"                                        | Accept the RSA fingerprint prompt (`adb devices` must say `device`, not `unauthorized`) |
+| Signing | Xcode → target → Signing & Capabilities → Team               | Debug keystore, automatic                                                               |
+| Run     | `pnpm ios -- --device`                                       | `pnpm android` with the device connected                                                |
 
 A physical device **can't** reach `localhost` on your Mac. Use the Mac's LAN IP (`ipconfig getifaddr en0`) on the same Wi-Fi, or `adb reverse` on Android. Push notifications, Bluetooth card readers and real GPS need a physical device.
 
@@ -319,17 +319,17 @@ ProjectName-mobile/
 
 ### 8.2 Naming conventions
 
-| Item | Convention | Example |
-| --- | --- | --- |
-| Screens | `PascalCase` folder + `index.tsx` | `screens/CreateOrder/index.tsx` |
-| Components | `PascalCase.tsx` | `components/ui/ErrorBoundary.tsx` |
-| Hooks | `useCamelCase.ts` | `hooks/useSocket.ts` |
-| Services | `camelCaseService.ts` | `services/paymentService.ts` |
-| API modules | per domain folder | `api/orders/index.ts`, `api/orders/useOrdersQuery.ts` |
-| Translation keys | `section.key` | `error.timeout`, `common.cancel` |
-| Socket events | `domain:action[:detail]` | `order:created`, `driver:location:update` |
-| Env vars | `UPPER_SNAKE_CASE`, same name in every environment | `BASE_URL` |
-| Branches | `type/short-description` | `feature/order-filters` |
+| Item             | Convention                                         | Example                                               |
+| ---------------- | -------------------------------------------------- | ----------------------------------------------------- |
+| Screens          | `PascalCase` folder + `index.tsx`                  | `screens/CreateOrder/index.tsx`                       |
+| Components       | `PascalCase.tsx`                                   | `components/ui/ErrorBoundary.tsx`                     |
+| Hooks            | `useCamelCase.ts`                                  | `hooks/useSocket.ts`                                  |
+| Services         | `camelCaseService.ts`                              | `services/paymentService.ts`                          |
+| API modules      | per domain folder                                  | `api/orders/index.ts`, `api/orders/useOrdersQuery.ts` |
+| Translation keys | `section.key`                                      | `error.timeout`, `common.cancel`                      |
+| Socket events    | `domain:action[:detail]`                           | `order:created`, `driver:location:update`             |
+| Env vars         | `UPPER_SNAKE_CASE`, same name in every environment | `BASE_URL`                                            |
+| Branches         | `type/short-description`                           | `feature/order-filters`                               |
 
 ### 8.3 Scripts
 
@@ -377,7 +377,14 @@ Add a `typecheck` script (`tsc --noEmit`) if CI doesn't already run one.
 - **Prettier** (project example `.prettierrc.json`):
 
 ```json
-{ "singleQuote": true, "semi": true, "trailingComma": "es5", "printWidth": 100, "tabWidth": 2, "endOfLine": "lf" }
+{
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "es5",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "endOfLine": "lf"
+}
 ```
 
 - **Pre-commit** (husky + lint-staged): format staged files, and run a secret / suspicious-code scan. The project example runs `gitleaks` plus a signature-scan script.
